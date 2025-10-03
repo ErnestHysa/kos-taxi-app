@@ -1,356 +1,412 @@
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button.jsx'
-import { Input } from '@/components/ui/input.jsx'
-import { Label } from '@/components/ui/label.jsx'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
-import { Alert, AlertDescription } from '@/components/ui/alert.jsx'
-import { Badge } from '@/components/ui/badge.jsx'
-import { Car, User, Phone, Mail, MapPin, Navigation, CheckCircle2, Loader2, RefreshCw } from 'lucide-react'
-
-const API_URL = window.location.origin
+import { useState, useEffect } from 'react';
+import { Car, User, Mail, Phone, CreditCard, CheckCircle, Clock, MapPin, LogOut } from 'lucide-react';
 
 export default function DriverView() {
-  const [driverForm, setDriverForm] = useState({
+  const [drivers, setDrivers] = useState([]);
+  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [pendingRides, setPendingRides] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
+  
+  // Registration form state
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     vehicleModel: '',
-    vehiclePlate: ''
-  })
-  
-  const [driverId, setDriverId] = useState(null)
-  const [drivers, setDrivers] = useState([])
-  const [pendingRides, setPendingRides] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(null)
+    licensePlate: ''
+  });
 
   useEffect(() => {
-    fetchDrivers()
-  }, [])
+    fetchDrivers();
+  }, []);
 
   useEffect(() => {
-    if (driverId) {
-      fetchPendingRides()
-      const interval = setInterval(fetchPendingRides, 10000) // Refresh every 10 seconds
-      return () => clearInterval(interval)
+    if (selectedDriver) {
+      fetchPendingRides();
+      const interval = setInterval(fetchPendingRides, 10000);
+      return () => clearInterval(interval);
     }
-  }, [driverId])
+  }, [selectedDriver]);
 
   const fetchDrivers = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/drivers`)
-      const data = await response.json()
-      if (response.ok) {
-        setDrivers(data.drivers || [])
-      }
-    } catch (err) {
-      console.error('Failed to fetch drivers:', err)
+      const response = await fetch('https://60h5imcl10ww.manus.space/api/drivers');
+      const data = await response.json();
+      setDrivers(data.drivers || []);
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
     }
-  }
+  };
 
   const fetchPendingRides = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/rides/pending`)
-      const data = await response.json()
-      if (response.ok) {
-        setPendingRides(data.rides || [])
-      }
-    } catch (err) {
-      console.error('Failed to fetch pending rides:', err)
+      const response = await fetch('https://60h5imcl10ww.manus.space/api/rides/pending');
+      const data = await response.json();
+      setPendingRides(data.rides || []);
+    } catch (error) {
+      console.error('Error fetching rides:', error);
     }
-  }
+  };
 
-  const handleDriverFormChange = (e) => {
-    const { name, value } = e.target
-    setDriverForm(prev => ({ ...prev, [name]: value }))
-  }
-
-  const handleRegisterDriver = async () => {
-    if (!driverForm.name || !driverForm.email || !driverForm.phone || !driverForm.vehicleModel || !driverForm.vehiclePlate) {
-      setError('Please fill in all fields')
-      return
-    }
-
-    setLoading(true)
-    setError(null)
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/drivers`, {
+      const response = await fetch('https://60h5imcl10ww.manus.space/api/drivers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: driverForm.name,
-          email: driverForm.email,
-          phone: driverForm.phone,
-          vehicle_model: driverForm.vehicleModel,
-          vehicle_plate: driverForm.vehiclePlate
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          vehicle_model: formData.vehicleModel,
+          license_plate: formData.licensePlate
         })
-      })
+      });
 
-      const data = await response.json()
       if (response.ok) {
-        setSuccess('Driver registered successfully!')
-        setDriverId(data.driver_id)
-        fetchDrivers()
-        setTimeout(() => setSuccess(null), 3000)
-      } else {
-        setError(data.error || 'Failed to register driver')
+        const data = await response.json();
+        await fetchDrivers();
+        setSelectedDriver(data.driver);
+        setShowRegistration(false);
+        setFormData({ name: '', email: '', phone: '', vehicleModel: '', licensePlate: '' });
       }
-    } catch (err) {
-      setError('Failed to connect to server')
+    } catch (error) {
+      console.error('Error registering driver:', error);
+      alert('Failed to register. Please try again.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-  const handleSelectDriver = (id) => {
-    setDriverId(id)
-    setError(null)
-  }
+  };
 
   const handleAcceptRide = async (rideId) => {
-    if (!driverId) {
-      setError('Please select a driver first')
-      return
-    }
-
-    setLoading(true)
-    setError(null)
+    if (!selectedDriver) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/rides/${rideId}/accept`, {
+      const response = await fetch(`https://60h5imcl10ww.manus.space/api/rides/${rideId}/accept`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ driver_id: driverId })
-      })
+        body: JSON.stringify({ driver_id: selectedDriver.id })
+      });
 
-      const data = await response.json()
       if (response.ok) {
-        setSuccess('Ride accepted! Customer will be notified.')
-        fetchPendingRides()
-        setTimeout(() => setSuccess(null), 3000)
-      } else {
-        setError(data.error || 'Failed to accept ride')
+        fetchPendingRides();
+        alert('Ride accepted! Contact the customer to confirm.');
       }
-    } catch (err) {
-      setError('Failed to connect to server')
-    } finally {
-      setLoading(false)
+    } catch (error) {
+      console.error('Error accepting ride:', error);
+      alert('Failed to accept ride. Please try again.');
     }
+  };
+
+  const handleLogout = () => {
+    setSelectedDriver(null);
+    setPendingRides([]);
+  };
+
+  // If no drivers exist, show registration
+  if (drivers.length === 0 && !showRegistration) {
+    return (
+      <div className="min-h-[600px] flex items-center justify-center p-6">
+        <div className="max-w-md w-full">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 shadow-lg border border-blue-100">
+            <div className="flex justify-center mb-6">
+              <div className="bg-blue-500 p-4 rounded-full">
+                <Car className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-3">
+              Welcome, Driver!
+            </h2>
+            <p className="text-gray-600 text-center mb-6">
+              Register your vehicle to start accepting ride requests and earning money.
+            </p>
+            
+            <button
+              onClick={() => setShowRegistration(true)}
+              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              Get Started
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  return (
-    <div className="space-y-6">
-      {success && (
-        <Alert className="bg-green-50 border-green-200">
-          <CheckCircle2 className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800">{success}</AlertDescription>
-        </Alert>
-      )}
+  // Registration Form
+  if (showRegistration || (drivers.length === 0)) {
+    return (
+      <div className="max-w-2xl mx-auto p-6">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <User className="w-6 h-6" />
+              Driver Registration
+            </h2>
+            <p className="text-blue-100 mt-1">Complete your profile to start driving</p>
+          </div>
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Driver Registration/Selection */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Driver Registration
-              </CardTitle>
-              <CardDescription>Register as a new driver</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  name="name"
+          <form onSubmit={handleRegister} className="p-6 space-y-5">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="John Doe"
-                  value={driverForm.name}
-                  onChange={handleDriverFormChange}
                 />
               </div>
-              <div>
-                <Label htmlFor="driver-email">Email</Label>
-                <Input
-                  id="driver-email"
-                  name="email"
-                  type="email"
-                  placeholder="driver@email.com"
-                  value={driverForm.email}
-                  onChange={handleDriverFormChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="driver-phone">Phone</Label>
-                <Input
-                  id="driver-phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="+30 123 456 7890"
-                  value={driverForm.phone}
-                  onChange={handleDriverFormChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="vehicleModel">Vehicle Model</Label>
-                <Input
-                  id="vehicleModel"
-                  name="vehicleModel"
-                  placeholder="e.g., Toyota Corolla"
-                  value={driverForm.vehicleModel}
-                  onChange={handleDriverFormChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="vehiclePlate">License Plate</Label>
-                <Input
-                  id="vehiclePlate"
-                  name="vehiclePlate"
-                  placeholder="e.g., ABC-1234"
-                  value={driverForm.vehiclePlate}
-                  onChange={handleDriverFormChange}
-                />
-              </div>
-              <Button 
-                onClick={handleRegisterDriver} 
-                className="w-full"
-                disabled={loading}
-              >
-                {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                Register Driver
-              </Button>
-            </CardContent>
-          </Card>
+            </div>
 
-          {drivers.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Select Driver Account</CardTitle>
-                <CardDescription>Choose your driver profile to view rides</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {drivers.map(driver => (
-                  <Button
-                    key={driver.id}
-                    onClick={() => handleSelectDriver(driver.id)}
-                    variant={driverId === driver.id ? "default" : "outline"}
-                    className="w-full justify-start"
-                  >
-                    <Car className="w-4 h-4 mr-2" />
-                    {driver.name} - {driver.vehicle_model}
-                  </Button>
-                ))}
-              </CardContent>
-            </Card>
-          )}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="driver@example.com"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Phone Number
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="tel"
+                  required
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="+30 694 123 4567"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Vehicle Model
+              </label>
+              <div className="relative">
+                <Car className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  required
+                  value={formData.vehicleModel}
+                  onChange={(e) => setFormData({...formData, vehicleModel: e.target.value})}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Mercedes E-Class"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                License Plate
+              </label>
+              <div className="relative">
+                <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  required
+                  value={formData.licensePlate}
+                  onChange={(e) => setFormData({...formData, licensePlate: e.target.value})}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="KOS-1234"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              {drivers.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowRegistration(false)}
+                  className="flex-1 px-6 py-3 border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+                >
+                  Cancel
+                </button>
+              )}
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Registering...' : 'Complete Registration'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Driver Selection (if not logged in)
+  if (!selectedDriver) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <Car className="w-6 h-6" />
+              Select Your Account
+            </h2>
+            <p className="text-blue-100 mt-1">Choose your driver profile to continue</p>
+          </div>
+
+          <div className="p-6">
+            <div className="grid gap-4 mb-6">
+              {drivers.map((driver) => (
+                <button
+                  key={driver.id}
+                  onClick={() => setSelectedDriver(driver)}
+                  className="flex items-center gap-4 p-4 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                >
+                  <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-3 rounded-full group-hover:scale-110 transition-transform">
+                    <User className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <h3 className="font-bold text-gray-900 text-lg">{driver.name}</h3>
+                    <p className="text-gray-600 text-sm">{driver.vehicle_model} • {driver.license_plate}</p>
+                  </div>
+                  <div className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <CheckCircle className="w-6 h-6" />
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setShowRegistration(true)}
+              className="w-full py-3 px-6 border-2 border-dashed border-gray-300 text-gray-600 rounded-xl font-semibold hover:border-blue-500 hover:text-blue-500 hover:bg-blue-50 transition-all"
+            >
+              + Register New Driver
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Driver Dashboard
+  return (
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
+      {/* Driver Header */}
+      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-xl p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
+              <User className="w-8 h-8" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">{selectedDriver.name}</h2>
+              <p className="text-blue-100">{selectedDriver.vehicle_model} • {selectedDriver.license_plate}</p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-xl transition-all"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-semibold">Logout</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Pending Rides */}
+      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-6">
+          <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Clock className="w-6 h-6" />
+            Pending Ride Requests
+          </h3>
+          <p className="text-green-100 mt-1">Accept rides to start earning</p>
         </div>
 
-        {/* Pending Rides */}
-        <div>
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Navigation className="w-5 h-5" />
-                    Pending Ride Requests
-                  </CardTitle>
-                  <CardDescription>
-                    {driverId ? 'Accept rides to start earning' : 'Select a driver to view rides'}
-                  </CardDescription>
-                </div>
-                {driverId && (
-                  <Button
-                    onClick={fetchPendingRides}
-                    variant="ghost"
-                    size="sm"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                  </Button>
-                )}
+        <div className="p-6">
+          {pendingRides.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-gray-400" />
               </div>
-            </CardHeader>
-            <CardContent>
-              {!driverId ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Car className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p>Please select a driver account first</p>
-                </div>
-              ) : pendingRides.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Navigation className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p>No pending rides at the moment</p>
-                  <p className="text-sm mt-1">Check back soon!</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {pendingRides.map(ride => (
-                    <Card key={ride.id} className="border-2 border-blue-200 bg-blue-50">
-                      <CardContent className="pt-4">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <Badge variant="secondary">Ride #{ride.id}</Badge>
-                            <span className="text-2xl font-bold text-blue-900">
-                              €{ride.fare.toFixed(2)}
-                            </span>
-                          </div>
-                          
-                          <div className="space-y-2 text-sm">
-                            <div className="flex items-start gap-2">
-                              <MapPin className="w-4 h-4 mt-0.5 text-green-600" />
-                              <div>
-                                <p className="font-medium">Pickup</p>
-                                <p className="text-gray-600">{ride.pickup_address}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-start gap-2">
-                              <Navigation className="w-4 h-4 mt-0.5 text-red-600" />
-                              <div>
-                                <p className="font-medium">Destination</p>
-                                <p className="text-gray-600">{ride.dest_address}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Mail className="w-4 h-4 text-gray-600" />
-                              <p className="text-gray-600">{ride.user_email}</p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Phone className="w-4 h-4 text-gray-600" />
-                              <p className="text-gray-600">{ride.user_phone}</p>
-                            </div>
-                          </div>
+              <p className="text-gray-500 font-medium">No pending rides at the moment</p>
+              <p className="text-gray-400 text-sm mt-1">Check back soon or refresh the page</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {pendingRides.map((ride) => (
+                <div
+                  key={ride.id}
+                  className="border-2 border-gray-200 rounded-xl p-5 hover:border-green-500 hover:shadow-lg transition-all"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-3">
+                        <MapPin className="w-5 h-5 text-green-500" />
+                        <span className="font-semibold text-gray-900">Pickup</span>
+                      </div>
+                      <p className="text-gray-700 ml-7">{ride.pickup_address}</p>
+                    </div>
+                  </div>
 
-                          <div className="pt-2">
-                            <p className="text-xs text-gray-500 mb-2">
-                              Distance: {ride.distance_km.toFixed(2)} km
-                            </p>
-                            <Button
-                              onClick={() => handleAcceptRide(ride.id)}
-                              className="w-full bg-green-600 hover:bg-green-700"
-                              disabled={loading}
-                            >
-                              {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                              Accept Ride
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-3">
+                        <MapPin className="w-5 h-5 text-red-500" />
+                        <span className="font-semibold text-gray-900">Destination</span>
+                      </div>
+                      <p className="text-gray-700 ml-7">{ride.destination_address}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <div className="flex gap-6">
+                      <div>
+                        <p className="text-sm text-gray-500">Distance</p>
+                        <p className="font-bold text-gray-900">{ride.distance_km?.toFixed(1)} km</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Fare</p>
+                        <p className="font-bold text-green-600">€{ride.estimated_fare?.toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Customer</p>
+                        <p className="font-bold text-gray-900">{ride.customer_phone}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleAcceptRide(ride.id)}
+                      className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                      Accept Ride
+                    </button>
+                  </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
-  )
+  );
 }

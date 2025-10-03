@@ -2,7 +2,7 @@
 
 A full-stack ride-hailing web application for private taxi services in Kos, Greece. Built with React, Flask, and Stripe payment integration.
 
-[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://60h5imcl10ww.manus.space)
+[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://77h9ikc69o8e.manus.space)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ## 🌟 Features
@@ -15,18 +15,31 @@ A full-stack ride-hailing web application for private taxi services in Kos, Gree
 - 💰 Distance-based fare calculation
 - 🚗 One-click ride request submission
 - 💳 Integrated Stripe payment processing
+- ✨ Modern UI with smooth animations
 
 ### For Drivers
-- 👤 Driver registration with vehicle details
+- 👤 Separated driver registration flow
 - 📊 Real-time ride request dashboard
 - ✅ Accept/decline ride functionality
 - 🔄 Auto-refresh every 10 seconds
 - 📜 Ride history tracking
 - 🔔 Contact information for each ride
+- 🎨 Clean account selection interface
+- 🚪 Easy logout functionality
 
 ## 🚀 Live Demo
 
-**Access the live application:** [https://60h5imcl10ww.manus.space](https://60h5imcl10ww.manus.space)
+**Access the live application:** [https://77h9ikc69o8e.manus.space](https://77h9ikc69o8e.manus.space)
+
+## 🎨 Modern UI/UX Design
+
+The application features a completely redesigned modern interface with:
+- **Gradient-based design** - Beautiful color transitions throughout
+- **Card-based layout** - Clean, organized sections
+- **Smooth animations** - Fade-ins, hover effects, and transitions
+- **Separated flows** - Clear distinction between registration and operations
+- **Icon integration** - Lucide icons for better visual communication
+- **Responsive design** - Works perfectly on desktop, tablet, and mobile
 
 ## 🛠️ Tech Stack
 
@@ -35,6 +48,7 @@ A full-stack ride-hailing web application for private taxi services in Kos, Gree
 - **Vite** - Build tool
 - **Tailwind CSS** - Styling
 - **Leaflet** - Interactive maps
+- **Lucide Icons** - Modern icon library
 - **Stripe Elements** - Payment UI
 
 ### Backend
@@ -185,7 +199,7 @@ See [KOS_TAXI_DOCUMENTATION.md](KOS_TAXI_DOCUMENTATION.md) for complete API refe
 ## 🚀 Deployment
 
 The application is deployed and running 24/7 at:
-**https://60h5imcl10ww.manus.space**
+**https://77h9ikc69o8e.manus.space**
 
 For deployment instructions, see [PRODUCTION_READY_GUIDE.md](PRODUCTION_READY_GUIDE.md).
 
@@ -196,6 +210,9 @@ kos-taxi-app/
 ├── frontend/              # React application
 │   ├── src/
 │   │   ├── components/   # React components
+│   │   │   ├── DriverView.jsx    # Driver dashboard
+│   │   │   ├── RiderView.jsx     # Rider interface
+│   │   │   └── MapComponent.jsx  # Map display
 │   │   ├── App.jsx       # Main app component
 │   │   └── main.jsx      # Entry point
 │   ├── package.json
@@ -219,13 +236,25 @@ kos-taxi-app/
 4. Set destination: "Tigaki Beach, Kos, Greece"
 5. Calculate fare
 6. Request ride
+7. See success screen
 
 ### Test Driver Flow
 1. Click "Driver Dashboard"
-2. Register with vehicle details
-3. Select account from dropdown
-4. View pending rides
+2. Select existing driver OR register new driver
+3. View dashboard with driver info
+4. See pending rides (auto-refreshes)
 5. Accept a ride
+6. Logout when done
+
+## 🎨 UI/UX Highlights
+
+- **Separated Registration Flow** - No more confusion between signup and dashboard
+- **Modern Gradient Design** - Beautiful color schemes throughout
+- **Smooth Animations** - Fade-ins, hover effects, transitions
+- **Clear Visual Hierarchy** - Easy to understand what to do next
+- **Loading States** - Visual feedback for all operations
+- **Success Screens** - Animated confirmations
+- **Responsive Layout** - Works on all screen sizes
 
 ## 🔒 Security
 
@@ -260,6 +289,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - OpenStreetMap for map tiles
 - Stripe for payment processing
 - Leaflet for map library
+- Lucide for modern icons
 
 ## 📞 Support
 
@@ -269,4 +299,4 @@ For issues and questions, please open an issue on GitHub.
 
 **Built for private taxi services in Kos, Greece 🇬🇷**
 
-**Live Demo:** [https://60h5imcl10ww.manus.space](https://60h5imcl10ww.manus.space)
+**Live Demo:** [https://77h9ikc69o8e.manus.space](https://77h9ikc69o8e.manus.space)
