@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Build outputs
+frontend/dist/
+frontend/build/
+backend/src/static/
+
+# Environment variables
+.env
+.env.local
+.env.production
+backend/.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+backend/instance/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+.cache/
+temp/
+tmp/
