@@ -2,7 +2,7 @@
 
 A full-stack ride-hailing web application for private taxi services in Kos, Greece. Built with React, Flask, and Stripe payment integration.
 
-[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://77h9ikc69o8e.manus.space)
+[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://example.com)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ## 🌟 Features
