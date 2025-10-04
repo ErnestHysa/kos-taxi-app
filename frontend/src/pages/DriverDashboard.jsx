@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Car, User, MapPin, Clock, LogOut, TrendingUp, DollarSign, CheckCircle, RefreshCw } from 'lucide-react';
+import { Car, User, MapPin, Clock, LogOut, DollarSign, CheckCircle, RefreshCw, Sparkles, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function DriverDashboard() {
@@ -101,227 +101,293 @@ export default function DriverDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Gradient Background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-700 animate-gradient-xy"></div>
+      
+      {/* Animated Blobs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <motion.div 
+          className="absolute top-0 left-0 w-96 h-96 bg-cyan-400/30 rounded-full blur-3xl"
+          animate={{
+            x: [0, 100, 0],
+            y: [0, 50, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-yellow-400/30 rounded-full blur-3xl"
+          animate={{
+            x: [0, -50, 0],
+            y: [0, -50, 0],
+            scale: [1, 1.3, 1],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+      </div>
+
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-lg border-b border-gray-200 shadow-sm sticky top-0 z-50">
+      <header className="relative z-50 bg-black/20 backdrop-blur-2xl border-b-2 border-white/20 shadow-2xl sticky top-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-purple-500 to-pink-600 p-2.5 rounded-xl shadow-lg">
-                <Car className="w-7 h-7 text-white" />
-              </div>
+              <motion.div 
+                className="relative"
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="absolute inset-0 bg-yellow-400 rounded-2xl blur-xl opacity-60"></div>
+                <div className="relative bg-gradient-to-br from-yellow-400 via-orange-400 to-red-500 p-3 rounded-2xl shadow-2xl">
+                  <Car className="w-7 h-7 text-white" />
+                </div>
+              </motion.div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-black text-white drop-shadow-lg flex items-center gap-2">
                   Kos Taxi
+                  <Sparkles className="w-5 h-5 text-yellow-300 animate-pulse" />
                 </h1>
-                <p className="text-xs text-gray-500 font-medium">Driver Dashboard</p>
+                <p className="text-sm text-white/80 font-bold">Driver Dashboard</p>
               </div>
             </div>
 
-            <button
+            <motion.button
               onClick={handleLogout}
-              className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-xl transition-all"
+              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm px-5 py-3 rounded-2xl transition-all border border-white/20"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <LogOut className="w-5 h-5 text-gray-600" />
-              <span className="font-semibold text-gray-700">Logout</span>
-            </button>
+              <LogOut className="w-5 h-5 text-white" />
+              <span className="font-bold text-white">Logout</span>
+            </motion.button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 py-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-6"
+          transition={{ duration: 0.6 }}
+          className="space-y-8"
         >
           {/* Driver Info Card */}
-          <div className="bg-gradient-to-r from-purple-500 to-pink-600 rounded-3xl shadow-2xl p-8 text-white">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="bg-white/20 backdrop-blur-sm p-4 rounded-2xl">
-                  <User className="w-10 h-10" />
-                </div>
-                <div>
-                  <h2 className="text-3xl font-bold mb-1">{driver?.name}</h2>
-                  <p className="text-purple-100 text-lg">
-                    {driver?.vehicle_model} • {driver?.license_plate}
-                  </p>
-                </div>
+          <motion.div 
+            className="relative group"
+            whileHover={{ scale: 1.01 }}
+          >
+            <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-cyan-600 rounded-3xl blur-2xl opacity-75 group-hover:opacity-100 transition duration-500"></div>
+            
+            <div className="relative bg-gradient-to-r from-orange-500 via-pink-600 to-purple-700 rounded-3xl shadow-2xl p-10 text-white overflow-hidden">
+              {/* Pattern Overlay */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.8),transparent_50%)]"></div>
               </div>
               
-              <div className="text-right">
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-3">
-                  <p className="text-purple-100 text-sm mb-1">Status</p>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="font-bold text-xl">Active</span>
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  <motion.div 
+                    className="relative"
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <div className="absolute inset-0 bg-white/30 rounded-full blur-xl"></div>
+                    <div className="relative bg-white/20 backdrop-blur-sm p-5 rounded-2xl border-2 border-white/30">
+                      <User className="w-12 h-12" />
+                    </div>
+                  </motion.div>
+                  <div>
+                    <h2 className="text-4xl font-black mb-2 drop-shadow-lg">{driver?.name}</h2>
+                    <p className="text-white/90 text-xl font-bold">
+                      🚗 {driver?.vehicle_model} • {driver?.license_plate}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-8 py-4 border-2 border-white/30">
+                    <p className="text-white/80 text-sm mb-2 font-bold">Status</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
+                      <span className="font-black text-2xl">Active</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Stats Grid */}
           <div className="grid md:grid-cols-3 gap-6">
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6"
-            >
-              <div className="flex items-center gap-4">
-                <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-4 rounded-xl">
-                  <Clock className="w-8 h-8 text-blue-600" />
+            {[
+              { icon: Clock, title: 'Pending Requests', value: pendingRides.length, color: 'from-cyan-400 to-blue-500', bg: 'from-cyan-500 to-blue-600' },
+              { icon: Zap, title: 'Rides Today', value: '0', color: 'from-green-400 to-emerald-500', bg: 'from-green-500 to-emerald-600' },
+              { icon: TrendingUp, title: 'Earnings Today', value: '€0.00', color: 'from-yellow-400 to-orange-500', bg: 'from-yellow-500 to-orange-600' }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ y: -10, scale: 1.03 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="relative group"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} rounded-2xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity`}></div>
+                <div className="relative bg-white/10 backdrop-blur-2xl border-2 border-white/20 rounded-2xl p-8 shadow-2xl">
+                  <div className="flex items-center gap-5">
+                    <motion.div 
+                      className={`bg-gradient-to-br ${stat.bg} p-4 rounded-xl shadow-lg`}
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      <stat.icon className="w-10 h-10 text-white" />
+                    </motion.div>
+                    <div>
+                      <p className="text-white/80 text-sm font-bold mb-1">{stat.title}</p>
+                      <p className="text-4xl font-black text-white drop-shadow-lg">{stat.value}</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-gray-500 text-sm font-medium">Pending Requests</p>
-                  <p className="text-3xl font-bold text-gray-900">{pendingRides.length}</p>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6"
-            >
-              <div className="flex items-center gap-4">
-                <div className="bg-gradient-to-br from-green-100 to-green-200 p-4 rounded-xl">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-gray-500 text-sm font-medium">Rides Today</p>
-                  <p className="text-3xl font-bold text-gray-900">0</p>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6"
-            >
-              <div className="flex items-center gap-4">
-                <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-4 rounded-xl">
-                  <DollarSign className="w-8 h-8 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-gray-500 text-sm font-medium">Earnings Today</p>
-                  <p className="text-3xl font-bold text-gray-900">€0.00</p>
-                </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            ))}
           </div>
 
           {/* Pending Rides */}
-          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <Clock className="w-7 h-7" />
-                    Pending Ride Requests
-                  </h3>
-                  <p className="text-green-100 mt-1 text-lg">Accept rides to start earning</p>
-                </div>
-                
-                <button
-                  onClick={() => fetchPendingRides()}
-                  disabled={refreshing}
-                  className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-xl transition-all flex items-center gap-2 text-white font-semibold"
-                >
-                  <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
-                  Refresh
-                </button>
-              </div>
-            </div>
-
-            <div className="p-6">
-              {pendingRides.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="bg-gradient-to-br from-gray-100 to-gray-200 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Clock className="w-10 h-10 text-gray-400" />
+          <motion.div 
+            className="relative group"
+            whileHover={{ scale: 1.005 }}
+          >
+            <div className="absolute -inset-1 bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600 rounded-3xl blur-2xl opacity-75 group-hover:opacity-100 transition duration-500"></div>
+            
+            <div className="relative bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl border-2 border-white/20 overflow-hidden">
+              <div className="bg-gradient-to-r from-green-500 via-emerald-600 to-teal-700 p-8">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-3xl font-black text-white flex items-center gap-4 drop-shadow-lg">
+                      <Clock className="w-9 h-9" />
+                      Pending Ride Requests
+                    </h3>
+                    <p className="text-white/90 mt-2 text-xl font-bold">💰 Accept rides to start earning</p>
                   </div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">No Pending Rides</h4>
-                  <p className="text-gray-500">New ride requests will appear here automatically</p>
+                  
+                  <motion.button
+                    onClick={() => fetchPendingRides()}
+                    disabled={refreshing}
+                    className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-2xl transition-all flex items-center gap-3 text-white font-black border-2 border-white/30"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <RefreshCw className={`w-6 h-6 ${refreshing ? 'animate-spin' : ''}`} />
+                    Refresh
+                  </motion.button>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {pendingRides.map((ride, index) => (
-                    <motion.div
-                      key={ride.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                      className="border-2 border-gray-200 rounded-2xl p-6 hover:border-green-500 hover:shadow-xl transition-all bg-gradient-to-br from-white to-gray-50"
+              </div>
+
+              <div className="p-8">
+                {pendingRides.length === 0 ? (
+                  <div className="text-center py-20">
+                    <motion.div 
+                      className="relative inline-block"
+                      animate={{ rotate: [0, 5, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <div className="space-y-4">
-                        {/* Pickup */}
-                        <div className="flex items-start gap-3">
-                          <div className="bg-green-100 p-2 rounded-lg mt-1">
-                            <MapPin className="w-5 h-5 text-green-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-gray-900 mb-1">Pickup Location</p>
-                            <p className="text-gray-700">{ride.pickup_address}</p>
-                          </div>
-                        </div>
-
-                        {/* Destination */}
-                        <div className="flex items-start gap-3">
-                          <div className="bg-red-100 p-2 rounded-lg mt-1">
-                            <MapPin className="w-5 h-5 text-red-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-gray-900 mb-1">Destination</p>
-                            <p className="text-gray-700">{ride.destination_address}</p>
-                          </div>
-                        </div>
-
-                        {/* Details & Action */}
-                        <div className="flex items-center justify-between pt-4 border-t-2 border-gray-100">
-                          <div className="flex gap-8">
-                            <div>
-                              <p className="text-sm text-gray-500 mb-1">Distance</p>
-                              <p className="font-bold text-gray-900 text-lg">
-                                {ride.distance_km?.toFixed(1)} km
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500 mb-1">Fare</p>
-                              <p className="font-bold text-green-600 text-lg">
-                                €{ride.estimated_fare?.toFixed(2)}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500 mb-1">Customer</p>
-                              <p className="font-bold text-gray-900 text-lg">
-                                {ride.customer_phone}
-                              </p>
-                            </div>
-                          </div>
-
-                          <button
-                            onClick={() => handleAcceptRide(ride.id)}
-                            className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-3 rounded-xl font-bold hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-2"
-                          >
-                            <CheckCircle className="w-5 h-5" />
-                            Accept Ride
-                          </button>
-                        </div>
+                      <div className="absolute inset-0 bg-white/30 rounded-full blur-2xl"></div>
+                      <div className="relative bg-white/20 backdrop-blur-sm w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-white/30">
+                        <Clock className="w-12 h-12 text-white" />
                       </div>
                     </motion.div>
-                  ))}
-                </div>
-              )}
+                    <h4 className="text-2xl font-black text-white mb-3 drop-shadow-lg">No Pending Rides</h4>
+                    <p className="text-white/80 text-lg font-semibold">New ride requests will appear here automatically</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {pendingRides.map((ride, index) => (
+                      <motion.div
+                        key={ride.id}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: index * 0.1 }}
+                        whileHover={{ scale: 1.02 }}
+                        className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:border-white/40 transition-all shadow-xl"
+                      >
+                        <div className="space-y-5">
+                          {/* Pickup */}
+                          <div className="flex items-start gap-4">
+                            <div className="bg-green-500 p-3 rounded-xl mt-1 shadow-lg">
+                              <MapPin className="w-6 h-6 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-black text-white mb-2 text-lg">📍 Pickup Location</p>
+                              <p className="text-white/90 text-lg font-semibold">{ride.pickup_address}</p>
+                            </div>
+                          </div>
+
+                          {/* Destination */}
+                          <div className="flex items-start gap-4">
+                            <div className="bg-red-500 p-3 rounded-xl mt-1 shadow-lg">
+                              <MapPin className="w-6 h-6 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-black text-white mb-2 text-lg">🎯 Destination</p>
+                              <p className="text-white/90 text-lg font-semibold">{ride.destination_address}</p>
+                            </div>
+                          </div>
+
+                          {/* Details & Action */}
+                          <div className="flex items-center justify-between pt-6 border-t-2 border-white/20">
+                            <div className="flex gap-10">
+                              <div>
+                                <p className="text-sm text-white/70 mb-2 font-bold">Distance</p>
+                                <p className="font-black text-white text-2xl">
+                                  {ride.distance_km?.toFixed(1)} km
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-white/70 mb-2 font-bold">Fare</p>
+                                <p className="font-black text-yellow-300 text-2xl drop-shadow-lg">
+                                  €{ride.estimated_fare?.toFixed(2)}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-white/70 mb-2 font-bold">Customer</p>
+                                <p className="font-black text-white text-2xl">
+                                  {ride.customer_phone}
+                                </p>
+                              </div>
+                            </div>
+
+                            <motion.button
+                              onClick={() => handleAcceptRide(ride.id)}
+                              className="bg-gradient-to-r from-green-400 to-emerald-500 text-white px-10 py-4 rounded-2xl font-black text-xl hover:from-green-500 hover:to-emerald-600 transition-all shadow-2xl flex items-center gap-3"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <CheckCircle className="w-7 h-7" />
+                              Accept Ride
+                            </motion.button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </main>
     </div>

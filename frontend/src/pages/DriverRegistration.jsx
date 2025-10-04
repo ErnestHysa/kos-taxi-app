@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, User, Mail, Phone, CreditCard, ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
+import { Car, User, Mail, Phone, CreditCard, ArrowLeft, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function DriverRegistration() {
@@ -87,28 +87,71 @@ export default function DriverRegistration() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Gradient Background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-green-500 via-teal-600 to-blue-700 animate-gradient-xy"></div>
+      
+      {/* Animated Blobs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <motion.div 
+          className="absolute top-0 right-0 w-96 h-96 bg-yellow-400/30 rounded-full blur-3xl"
+          animate={{
+            x: [0, -50, 0],
+            y: [0, 50, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-pink-400/30 rounded-full blur-3xl"
+          animate={{
+            x: [0, 50, 0],
+            y: [0, -50, 0],
+            scale: [1, 1.3, 1],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+      </div>
+
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-lg border-b border-gray-200 shadow-sm">
+      <header className="relative z-50 bg-black/20 backdrop-blur-2xl border-b-2 border-white/20 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-4">
-              <button
+              <motion.button
                 onClick={() => navigate('/driver/login')}
-                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/20"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <ArrowLeft className="w-6 h-6 text-gray-600" />
-              </button>
+                <ArrowLeft className="w-6 h-6 text-white" />
+              </motion.button>
               
               <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-purple-500 to-pink-600 p-2.5 rounded-xl shadow-lg">
-                  <Car className="w-7 h-7 text-white" />
-                </div>
+                <motion.div 
+                  className="relative"
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <div className="absolute inset-0 bg-yellow-400 rounded-2xl blur-xl opacity-60"></div>
+                  <div className="relative bg-gradient-to-br from-yellow-400 via-orange-400 to-red-500 p-3 rounded-2xl shadow-2xl">
+                    <Car className="w-7 h-7 text-white" />
+                  </div>
+                </motion.div>
                 <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  <h1 className="text-2xl font-black text-white drop-shadow-lg flex items-center gap-2">
                     Kos Taxi
+                    <Sparkles className="w-5 h-5 text-yellow-300 animate-pulse" />
                   </h1>
-                  <p className="text-xs text-gray-500 font-medium">Driver Registration</p>
+                  <p className="text-sm text-white/80 font-bold">Driver Registration</p>
                 </div>
               </div>
             </div>
@@ -117,216 +160,232 @@ export default function DriverRegistration() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-2xl mx-auto px-4 py-12">
+      <main className="relative z-10 max-w-2xl mx-auto px-4 py-12">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
           {/* Progress Steps */}
-          <div className="mb-8">
+          <div className="mb-10">
             <div className="flex items-center justify-center gap-4">
               {[1, 2].map((step) => (
                 <div key={step} className="flex items-center gap-4">
-                  <div className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-lg transition-all ${
-                    currentStep >= step
-                      ? 'bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-lg'
-                      : 'bg-gray-200 text-gray-500'
-                  }`}>
-                    {currentStep > step ? <CheckCircle2 className="w-6 h-6" /> : step}
-                  </div>
+                  <motion.div 
+                    className={`flex items-center justify-center w-16 h-16 rounded-full font-black text-xl transition-all shadow-2xl ${
+                      currentStep >= step
+                        ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white'
+                        : 'bg-white/20 backdrop-blur-sm text-white/50 border-2 border-white/30'
+                    }`}
+                    whileHover={{ scale: 1.1 }}
+                  >
+                    {currentStep > step ? <CheckCircle2 className="w-8 h-8" /> : step}
+                  </motion.div>
                   {step < 2 && (
-                    <div className={`w-20 h-1 rounded-full transition-all ${
-                      currentStep > step ? 'bg-gradient-to-r from-purple-500 to-pink-600' : 'bg-gray-200'
+                    <div className={`w-24 h-2 rounded-full transition-all ${
+                      currentStep > step ? 'bg-gradient-to-r from-yellow-400 to-orange-500' : 'bg-white/20'
                     }`}></div>
                   )}
                 </div>
               ))}
             </div>
             
-            <div className="text-center mt-4">
-              <p className="text-gray-600 font-medium">
-                Step {currentStep} of 2: {currentStep === 1 ? 'Personal Information' : 'Vehicle Details'}
+            <div className="text-center mt-6">
+              <p className="text-white/90 font-bold text-xl">
+                Step {currentStep} of 2: {currentStep === 1 ? '👤 Personal Information' : '🚗 Vehicle Details'}
               </p>
             </div>
           </div>
 
           {/* Form */}
-          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-500 to-pink-600 p-8">
-              <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+          <motion.div 
+            className="relative group"
+            whileHover={{ scale: 1.01 }}
+          >
+            <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-cyan-600 rounded-3xl blur-2xl opacity-75 group-hover:opacity-100 transition duration-500"></div>
+            
+            <div className="relative bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl border-2 border-white/20 overflow-hidden">
+              <div className="bg-gradient-to-r from-green-500 via-teal-600 to-blue-700 p-10">
+                <h2 className="text-4xl font-black text-white flex items-center gap-4 drop-shadow-lg">
+                  {currentStep === 1 ? (
+                    <>
+                      <User className="w-10 h-10" />
+                      Personal Information
+                    </>
+                  ) : (
+                    <>
+                      <Car className="w-10 h-10" />
+                      Vehicle Details
+                    </>
+                  )}
+                </h2>
+                <p className="text-white/90 mt-3 text-xl font-semibold">
+                  {currentStep === 1 
+                    ? '✨ Tell us about yourself'
+                    : '🚙 Information about your vehicle'
+                  }
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="p-10">
                 {currentStep === 1 ? (
-                  <>
-                    <User className="w-8 h-8" />
-                    Personal Information
-                  </>
-                ) : (
-                  <>
-                    <Car className="w-8 h-8" />
-                    Vehicle Details
-                  </>
-                )}
-              </h2>
-              <p className="text-purple-100 mt-2 text-lg">
-                {currentStep === 1 
-                  ? 'Tell us about yourself'
-                  : 'Information about your vehicle'
-                }
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-8">
-              {currentStep === 1 ? (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="space-y-6"
-                >
-                  {/* Name */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Full Name *
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-lg ${
-                          errors.name ? 'border-red-500' : 'border-gray-200'
-                        }`}
-                        placeholder="John Doe"
-                      />
-                    </div>
-                    {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-                  </div>
-
-                  {/* Email */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email Address *
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-lg ${
-                          errors.email ? 'border-red-500' : 'border-gray-200'
-                        }`}
-                        placeholder="driver@example.com"
-                      />
-                    </div>
-                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-                  </div>
-
-                  {/* Phone */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Phone Number *
-                    </label>
-                    <div className="relative">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-lg ${
-                          errors.phone ? 'border-red-500' : 'border-gray-200'
-                        }`}
-                        placeholder="+30 694 123 4567"
-                      />
-                    </div>
-                    {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-purple-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="space-y-6"
                   >
-                    Continue
-                  </button>
-                </motion.div>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="space-y-6"
-                >
-                  {/* Vehicle Model */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Vehicle Model *
-                    </label>
-                    <div className="relative">
-                      <Car className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="text"
-                        value={formData.vehicleModel}
-                        onChange={(e) => setFormData({...formData, vehicleModel: e.target.value})}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-lg ${
-                          errors.vehicleModel ? 'border-red-500' : 'border-gray-200'
-                        }`}
-                        placeholder="Mercedes E-Class"
-                      />
+                    {/* Name */}
+                    <div>
+                      <label className="block text-lg font-black text-white mb-3">
+                        Full Name *
+                      </label>
+                      <div className="relative">
+                        <User className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                        <input
+                          type="text"
+                          value={formData.name}
+                          onChange={(e) => setFormData({...formData, name: e.target.value})}
+                          className={`w-full pl-14 pr-5 py-5 bg-white/90 backdrop-blur-sm border-2 rounded-2xl focus:ring-4 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-lg font-semibold ${
+                            errors.name ? 'border-red-500' : 'border-white/30'
+                          }`}
+                          placeholder="John Doe"
+                        />
+                      </div>
+                      {errors.name && <p className="text-red-300 text-sm mt-2 font-bold">{errors.name}</p>}
                     </div>
-                    {errors.vehicleModel && <p className="text-red-500 text-sm mt-1">{errors.vehicleModel}</p>}
-                  </div>
 
-                  {/* License Plate */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      License Plate *
-                    </label>
-                    <div className="relative">
-                      <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="text"
-                        value={formData.licensePlate}
-                        onChange={(e) => setFormData({...formData, licensePlate: e.target.value})}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-lg ${
-                          errors.licensePlate ? 'border-red-500' : 'border-gray-200'
-                        }`}
-                        placeholder="KOS-1234"
-                      />
+                    {/* Email */}
+                    <div>
+                      <label className="block text-lg font-black text-white mb-3">
+                        Email Address *
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({...formData, email: e.target.value})}
+                          className={`w-full pl-14 pr-5 py-5 bg-white/90 backdrop-blur-sm border-2 rounded-2xl focus:ring-4 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-lg font-semibold ${
+                            errors.email ? 'border-red-500' : 'border-white/30'
+                          }`}
+                          placeholder="driver@example.com"
+                        />
+                      </div>
+                      {errors.email && <p className="text-red-300 text-sm mt-2 font-bold">{errors.email}</p>}
                     </div>
-                    {errors.licensePlate && <p className="text-red-500 text-sm mt-1">{errors.licensePlate}</p>}
-                  </div>
 
-                  <div className="flex gap-4">
-                    <button
+                    {/* Phone */}
+                    <div>
+                      <label className="block text-lg font-black text-white mb-3">
+                        Phone Number *
+                      </label>
+                      <div className="relative">
+                        <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                        <input
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                          className={`w-full pl-14 pr-5 py-5 bg-white/90 backdrop-blur-sm border-2 rounded-2xl focus:ring-4 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-lg font-semibold ${
+                            errors.phone ? 'border-red-500' : 'border-white/30'
+                          }`}
+                          placeholder="+30 694 123 4567"
+                        />
+                      </div>
+                      {errors.phone && <p className="text-red-300 text-sm mt-2 font-bold">{errors.phone}</p>}
+                    </div>
+
+                    <motion.button
                       type="button"
-                      onClick={handleBack}
-                      className="flex-1 px-6 py-4 border-2 border-gray-200 text-gray-700 rounded-xl font-bold text-lg hover:bg-gray-50 transition-all"
+                      onClick={handleNext}
+                      className="w-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white py-5 px-6 rounded-2xl font-black text-xl hover:from-yellow-500 hover:to-red-600 transition-all duration-300 shadow-2xl"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      Back
-                    </button>
-                    
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="flex-1 bg-gradient-to-r from-purple-500 to-pink-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-purple-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-6 h-6 animate-spin" />
-                          Registering...
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 className="w-6 h-6" />
-                          Complete Registration
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </form>
-          </div>
+                      Continue →
+                    </motion.button>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="space-y-6"
+                  >
+                    {/* Vehicle Model */}
+                    <div>
+                      <label className="block text-lg font-black text-white mb-3">
+                        Vehicle Model *
+                      </label>
+                      <div className="relative">
+                        <Car className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                        <input
+                          type="text"
+                          value={formData.vehicleModel}
+                          onChange={(e) => setFormData({...formData, vehicleModel: e.target.value})}
+                          className={`w-full pl-14 pr-5 py-5 bg-white/90 backdrop-blur-sm border-2 rounded-2xl focus:ring-4 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-lg font-semibold ${
+                            errors.vehicleModel ? 'border-red-500' : 'border-white/30'
+                          }`}
+                          placeholder="Mercedes E-Class"
+                        />
+                      </div>
+                      {errors.vehicleModel && <p className="text-red-300 text-sm mt-2 font-bold">{errors.vehicleModel}</p>}
+                    </div>
+
+                    {/* License Plate */}
+                    <div>
+                      <label className="block text-lg font-black text-white mb-3">
+                        License Plate *
+                      </label>
+                      <div className="relative">
+                        <CreditCard className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                        <input
+                          type="text"
+                          value={formData.licensePlate}
+                          onChange={(e) => setFormData({...formData, licensePlate: e.target.value})}
+                          className={`w-full pl-14 pr-5 py-5 bg-white/90 backdrop-blur-sm border-2 rounded-2xl focus:ring-4 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-lg font-semibold ${
+                            errors.licensePlate ? 'border-red-500' : 'border-white/30'
+                          }`}
+                          placeholder="KOS-1234"
+                        />
+                      </div>
+                      {errors.licensePlate && <p className="text-red-300 text-sm mt-2 font-bold">{errors.licensePlate}</p>}
+                    </div>
+
+                    <div className="flex gap-4">
+                      <motion.button
+                        type="button"
+                        onClick={handleBack}
+                        className="flex-1 px-6 py-5 bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white rounded-2xl font-black text-xl hover:bg-white/30 transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        ← Back
+                      </motion.button>
+                      
+                      <motion.button
+                        type="submit"
+                        disabled={loading}
+                        className="flex-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white py-5 px-6 rounded-2xl font-black text-xl hover:from-yellow-500 hover:to-red-600 transition-all duration-300 shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                        whileHover={{ scale: loading ? 1 : 1.02 }}
+                        whileTap={{ scale: loading ? 1 : 0.98 }}
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="w-7 h-7 animate-spin" />
+                            Registering...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="w-7 h-7" />
+                            Complete Registration
+                          </>
+                        )}
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+              </form>
+            </div>
+          </motion.div>
         </motion.div>
       </main>
     </div>
