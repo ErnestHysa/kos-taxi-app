@@ -30,7 +30,7 @@ export const initialiseAuthState = (queryClient: QueryClient): void => {
 export const useDriverProfileQuery = () => {
   const tokens = loadTokens()
 
-  return useQuery<{ driver: Driver }, Error, Driver>({
+  return useQuery<Driver, Error>({
     queryKey: authQueryKeys.driver(),
     queryFn: async () => {
       const { data } = await apiClient.get<{ driver: Driver }>('/drivers/me')
@@ -38,7 +38,6 @@ export const useDriverProfileQuery = () => {
     },
     enabled: Boolean(tokens?.accessToken || tokens?.refreshToken),
     staleTime: 60 * 1000,
-    select: (data) => data.driver,
   })
 }
 
