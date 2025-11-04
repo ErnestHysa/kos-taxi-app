@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
-from src.models.ride import db, Driver
+from src.models import db
+from src.models.ride import Driver
 
 driver_bp = Blueprint('driver', __name__)
 

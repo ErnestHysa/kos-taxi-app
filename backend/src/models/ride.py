@@ -1,7 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
-db = SQLAlchemy()
+from . import db
 
 class Ride(db.Model):
     __tablename__ = 'rides'

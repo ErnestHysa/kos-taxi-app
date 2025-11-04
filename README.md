@@ -63,6 +63,23 @@ The application features a completely redesigned modern interface with:
 - Python 3.11+
 - Stripe account (for payment processing)
 
+## 🔐 Configuration
+
+1. Copy the sample environment file and update the values as needed:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   - Backend settings (secret key, database URL, and Stripe secrets) are loaded from `.env` automatically when the Flask app starts.
+   - The `VITE_STRIPE_PUBLISHABLE_KEY` entry is used when you configure the frontend build (see the frontend setup section below).
+
+2. Export the backend variables in your shell before running the server (or use a tool like [direnv](https://direnv.net/)):
+
+   ```bash
+   export $(grep -v '^#' .env | xargs)
+   ```
+
 ## 🔧 Installation
 
 ### 1. Clone the Repository
@@ -79,9 +96,9 @@ cd frontend
 pnpm install
 ```
 
-Create `.env` file:
-```env
-VITE_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+Create a `frontend/.env` file (or copy from `.env`) to expose the publishable key to Vite:
+```bash
+echo "VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY}" > frontend/.env
 ```
 
 ### 3. Setup Backend
@@ -93,10 +110,8 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Update Stripe secret key in `backend/src/routes/ride.py`:
-```python
-stripe.api_key = "your_stripe_secret_key"
-```
+The backend reads Stripe credentials and Flask settings from the exported environment variables (see [Configuration](#-configuration)).
+On startup it also bootstraps the `backend/src/database/` directory and initialises Flask-Migrate metadata automatically.
 
 ### 4. Run the Application
 
@@ -115,18 +130,21 @@ source venv/bin/activate
 python src/main.py
 ```
 
+The helper script `backend/scripts/build_static.py` validates that `frontend/dist/` exists before copying files and ensures `backend/src/static/` is created, preventing missing-folder errors during deployment.
+
 **Production Mode:**
 
 ```bash
 # Build frontend
 cd frontend
 pnpm run build
+cd ..
 
-# Copy to backend static folder
-cp -r dist/* ../backend/src/static/
+# Copy built assets with safety checks
+python backend/scripts/build_static.py
 
 # Run backend
-cd ../backend
+cd backend
 source venv/bin/activate
 python src/main.py
 ```
@@ -146,9 +164,9 @@ Use these test card numbers:
 ### Live Mode (Production)
 
 1. Get your live Stripe keys from [dashboard.stripe.com](https://dashboard.stripe.com)
-2. Update keys in:
-   - Frontend: `.env` file
-   - Backend: `src/routes/ride.py`
+2. Update keys in your environment configuration:
+   - Frontend: `frontend/.env` (`VITE_STRIPE_PUBLISHABLE_KEY`)
+   - Backend: `.env` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`)
 3. Rebuild and redeploy
 
 ## 💰 Pricing Configuration
