@@ -1,3 +1,5 @@
+import type { PaymentSummary } from './payment'
+
 export type RideStatus = 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled'
 
 export interface Ride {
@@ -26,4 +28,5 @@ export interface Ride {
   customer_phone?: string | null
   created_at: string | null
   updated_at: string | null
+  payment?: PaymentSummary | null
 }

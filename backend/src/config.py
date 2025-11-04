@@ -33,6 +33,24 @@ class Config:
     STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
     STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
 
+    # Notification providers configuration
+    NOTIFICATIONS_EMAIL_PROVIDER = os.environ.get(
+        "NOTIFICATIONS_EMAIL_PROVIDER", "console"
+    )
+    NOTIFICATIONS_SMS_PROVIDER = os.environ.get(
+        "NOTIFICATIONS_SMS_PROVIDER", "console"
+    )
+    NOTIFICATIONS_FROM_EMAIL = os.environ.get("NOTIFICATIONS_FROM_EMAIL")
+    SMTP_HOST = os.environ.get("SMTP_HOST")
+    SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
+    SMTP_USERNAME = os.environ.get("SMTP_USERNAME")
+    SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD")
+    NOTIFICATIONS_SMS_WEBHOOK_URL = os.environ.get("NOTIFICATIONS_SMS_WEBHOOK_URL")
+    NOTIFICATIONS_SMS_WEBHOOK_TOKEN = os.environ.get("NOTIFICATIONS_SMS_WEBHOOK_TOKEN")
+    NOTIFICATIONS_DEFAULT_SMS_SENDER = os.environ.get(
+        "NOTIFICATIONS_DEFAULT_SMS_SENDER", "KosTaxi"
+    )
+
 
 class DevelopmentConfig(Config):
     DEBUG = True

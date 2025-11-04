@@ -1,56 +1,48 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { CalendarClock, Mail, MapPin, Phone, StickyNote, User, Users } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CalendarClock, Mail, MapPin, Phone, StickyNote, User, Users } from 'lucide-react'
+import { useMemo } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   rideBookingSchema,
   type RideBookingFormValues,
   sanitiseNotes,
   isFutureDateTime,
   parseDateTimeInput,
-} from '../../utils/validators';
+} from '../../utils/validators'
 import {
   type CreateRideResponse,
-  type PaymentIntentResponse,
-  type RideEstimateResponse,
-  useCreatePaymentIntent,
   useCreateRide,
   useRideEstimate,
-} from '../../api/rides';
-import { cn } from '../../lib/utils';
+} from '../../api/rides'
+import { cn } from '../../lib/utils'
 
 export interface RiderViewProps {
-  onSubmitting?: () => void;
-  onRideCreated: (result: RiderBookingResult) => void;
-  onError: (message: string) => void;
+  onSubmitting?: () => void
+  onRideCreated: (result: RiderBookingResult) => void
+  onError: (message: string) => void
 }
 
-export interface RiderBookingResult extends CreateRideResponse {
-  paymentIntent?: PaymentIntentResponse | null;
-  paymentError?: string | null;
-}
+export type RiderBookingResult = CreateRideResponse
 
 const minutesFromNow = (minutes: number): Date => {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() + minutes);
-  return now;
-};
+  const now = new Date()
+  now.setMinutes(now.getMinutes() + minutes)
+  return now
+}
 
 const toDateTimeLocalValue = (date: Date): string => {
-  const pad = (value: number) => value.toString().padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-};
+  const pad = (value: number) => value.toString().padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
 
-const computeDefaultScheduledAt = () => toDateTimeLocalValue(minutesFromNow(20));
+const computeDefaultScheduledAt = () => toDateTimeLocalValue(minutesFromNow(20))
 
-const labelStyles = 'text-xs font-semibold uppercase tracking-wide text-white/70 flex items-center gap-2';
+const labelStyles = 'text-xs font-semibold uppercase tracking-wide text-white/70 flex items-center gap-2'
 const inputStyles =
-  'w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/60 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/60 backdrop-blur-sm transition-all';
-const errorStyles = 'mt-1 text-xs font-semibold text-yellow-300';
+  'w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/60 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/60 backdrop-blur-sm transition-all'
+const errorStyles = 'mt-1 text-xs font-semibold text-yellow-300'
 
 const RiderView = ({ onSubmitting, onRideCreated, onError }: RiderViewProps) => {
-  const [quote, setQuote] = useState<RideEstimateResponse | null>(null);
-
   const {
     register,
     handleSubmit,
@@ -69,18 +61,17 @@ const RiderView = ({ onSubmitting, onRideCreated, onError }: RiderViewProps) => 
       passengerCount: 1,
       notes: '',
     },
-  });
+  })
 
-  const { estimateRide, loading: estimating } = useRideEstimate();
-  const { createRide, loading: creating } = useCreateRide();
-  const { createPaymentIntent, loading: creatingIntent } = useCreatePaymentIntent();
+  const { estimateRide, loading: estimating } = useRideEstimate()
+  const { createRide, loading: creating } = useCreateRide()
 
   const submitRide = handleSubmit(async (values) => {
-    onSubmitting?.();
+    onSubmitting?.()
     try {
-      const scheduledTime = parseDateTimeInput(values.scheduledAt);
+      const scheduledTime = parseDateTimeInput(values.scheduledAt)
       if (!scheduledTime || !isFutureDateTime(values.scheduledAt)) {
-        throw new Error('Please select a pickup time in the near future.');
+        throw new Error('Please select a pickup time in the near future.')
       }
 
       const estimatePayload = {
@@ -88,9 +79,9 @@ const RiderView = ({ onSubmitting, onRideCreated, onError }: RiderViewProps) => 
         dropoffAddress: values.dropoffAddress,
         scheduledTime: scheduledTime.toISOString(),
         passengerCount: values.passengerCount,
-      };
+      }
 
-      const estimate = await estimateRide(estimatePayload);
+      await estimateRide(estimatePayload)
 
       const rideResponse = await createRide({
         ...estimatePayload,
@@ -98,18 +89,7 @@ const RiderView = ({ onSubmitting, onRideCreated, onError }: RiderViewProps) => 
         riderEmail: values.riderEmail,
         riderPhone: values.riderPhone,
         notes: sanitiseNotes(values.notes),
-      });
-
-      setQuote(estimate);
-
-      let paymentIntent: PaymentIntentResponse | null = null;
-      let paymentError: string | null = null;
-
-      try {
-        paymentIntent = await createPaymentIntent(rideResponse.ride.id);
-      } catch (intentError) {
-        paymentError = intentError instanceof Error ? intentError.message : 'Unable to create payment intent.';
-      }
+      })
 
       reset({
         riderName: values.riderName,
@@ -120,23 +100,22 @@ const RiderView = ({ onSubmitting, onRideCreated, onError }: RiderViewProps) => 
         scheduledAt: computeDefaultScheduledAt(),
         passengerCount: values.passengerCount,
         notes: '',
-      });
+      })
 
-      onRideCreated({ ...rideResponse, paymentIntent, paymentError });
+      onRideCreated(rideResponse)
     } catch (error) {
-      setQuote(null);
-      const message = error instanceof Error ? error.message : 'Unable to book ride. Please try again.';
-      onError(message);
+      const message = error instanceof Error ? error.message : 'Unable to book ride. Please try again.'
+      onError(message)
     }
-  });
+  })
 
-  const totalLoading = estimating || creating || creatingIntent || isSubmitting;
+  const totalLoading = estimating || creating || isSubmitting
 
-  const scheduledAtValue = watch('scheduledAt');
+  const scheduledAtValue = watch('scheduledAt')
   const formattedPickupTime = useMemo(() => {
-    const parsed = parseDateTimeInput(scheduledAtValue ?? '');
-    return parsed ? parsed.toLocaleString() : 'Select a pickup time';
-  }, [scheduledAtValue]);
+    const parsed = parseDateTimeInput(scheduledAtValue ?? '')
+    return parsed ? parsed.toLocaleString() : 'Select a pickup time'
+  }, [scheduledAtValue])
 
   return (
     <div className="relative">
@@ -209,7 +188,6 @@ const RiderView = ({ onSubmitting, onRideCreated, onError }: RiderViewProps) => 
                 type="number"
                 min={1}
                 max={6}
-                step={1}
                 className={inputStyles}
                 {...register('passengerCount', { valueAsNumber: true })}
               />
@@ -221,12 +199,12 @@ const RiderView = ({ onSubmitting, onRideCreated, onError }: RiderViewProps) => 
             <div className="space-y-2">
               <label className={labelStyles} htmlFor="pickupAddress">
                 <MapPin className="h-4 w-4" />
-                Pickup location
+                Pickup address
               </label>
               <input
                 id="pickupAddress"
                 type="text"
-                placeholder="Kos International Airport"
+                placeholder="Kos Airport (KGS)"
                 className={inputStyles}
                 {...register('pickupAddress')}
               />
@@ -235,13 +213,13 @@ const RiderView = ({ onSubmitting, onRideCreated, onError }: RiderViewProps) => 
 
             <div className="space-y-2">
               <label className={labelStyles} htmlFor="dropoffAddress">
-                <MapPin className="h-4 w-4 rotate-180" />
-                Drop-off location
+                <MapPin className="h-4 w-4" />
+                Drop-off address
               </label>
               <input
                 id="dropoffAddress"
                 type="text"
-                placeholder="Kos Old Town"
+                placeholder="Kos Town Harbour"
                 className={inputStyles}
                 {...register('dropoffAddress')}
               />
@@ -255,59 +233,41 @@ const RiderView = ({ onSubmitting, onRideCreated, onError }: RiderViewProps) => 
                 <CalendarClock className="h-4 w-4" />
                 Pickup time
               </label>
-              <input
-                id="scheduledAt"
-                type="datetime-local"
-                min={computeDefaultScheduledAt()}
-                className={inputStyles}
-                {...register('scheduledAt')}
-              />
+              <input id="scheduledAt" type="datetime-local" className={inputStyles} {...register('scheduledAt')} />
               {errors.scheduledAt && <p className={errorStyles}>{errors.scheduledAt.message}</p>}
-              <p className="text-xs font-semibold text-white/60">Scheduled for: {formattedPickupTime}</p>
+              <p className="text-xs font-semibold text-white/60">{formattedPickupTime}</p>
             </div>
 
             <div className="space-y-2">
               <label className={labelStyles} htmlFor="notes">
                 <StickyNote className="h-4 w-4" />
-                Notes (optional)
+                Notes for your driver
               </label>
               <textarea
                 id="notes"
-                rows={4}
-                placeholder="Flight number, luggage details, or any special request"
-                className={cn(inputStyles, 'min-h-[120px] resize-none')}
+                rows={3}
+                placeholder="Any special requests or luggage details?"
+                className={`${inputStyles} min-h-[120px]`}
                 {...register('notes')}
               />
               {errors.notes && <p className={errorStyles}>{errors.notes.message}</p>}
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 rounded-2xl border border-white/20 bg-white/5 p-6">
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="text-sm font-bold uppercase tracking-wider text-white/60">Realtime estimate</p>
-                <p className="text-lg font-semibold text-white/80">
-                  {quote
-                    ? `Approximately ${quote.distanceKm.toFixed(1)} km • ${quote.durationMinutes} minutes • €${quote.fare.toFixed(2)}`
-                    : 'Enter your details and submit to see the fare estimate.'}
-                </p>
-              </div>
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 px-6 py-3 text-lg font-black text-black shadow-lg transition hover:from-yellow-300 hover:to-pink-400 disabled:cursor-not-allowed disabled:opacity-70"
-                disabled={totalLoading}
-              >
-                {totalLoading ? 'Booking ride…' : 'Book ride'}
-              </button>
-            </div>
-            <p className="text-xs font-semibold text-white/50">
-              We will reserve your ride immediately. Payment is processed securely via Stripe once a driver accepts the request.
-            </p>
-          </div>
+          <button
+            type="submit"
+            disabled={totalLoading}
+            className={cn(
+              'inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-black shadow-lg transition-all hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black',
+              totalLoading && 'opacity-70',
+            )}
+          >
+            {totalLoading ? 'Booking...' : 'Book ride'}
+          </button>
         </form>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default RiderView;
+export default RiderView
