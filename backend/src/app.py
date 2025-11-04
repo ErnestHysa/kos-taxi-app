@@ -11,7 +11,8 @@ from flask_migrate import Migrate, init as migrations_init
 
 from .config import Config, DATABASE_DIR, BASE_DIR, get_config
 from .models import db
-from .routes.driver import driver_bp
+from .auth import auth_bp
+from .routes.drivers import driver_bp
 from .routes.ride import ride_bp
 from .routes.user import user_bp
 
@@ -35,6 +36,7 @@ def create_app(config_class: Optional[Type[Config]] = None) -> Flask:
 
     _bootstrap_filesystem(app)
 
+    app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(ride_bp, url_prefix='/api')
     app.register_blueprint(driver_bp, url_prefix='/api')
     app.register_blueprint(user_bp, url_prefix='/api')

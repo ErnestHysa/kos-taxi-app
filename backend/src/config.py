@@ -22,6 +22,12 @@ class Config:
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", SECRET_KEY)
+    JWT_ACCESS_TOKEN_EXPIRES = int(os.environ.get("JWT_ACCESS_TOKEN_EXPIRES", 15 * 60))
+    JWT_REFRESH_TOKEN_EXPIRES = int(
+        os.environ.get("JWT_REFRESH_TOKEN_EXPIRES", 7 * 24 * 60 * 60)
+    )
+
     # Stripe configuration - values must be supplied via environment variables
     STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
     STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
