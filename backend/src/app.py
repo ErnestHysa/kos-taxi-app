@@ -9,10 +9,12 @@ from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_migrate import Migrate
 
-from .config import Config, DATABASE_DIR, BASE_DIR, get_config
+from .config import BASE_DIR, Config, DATABASE_DIR, get_config
 from .models import db
 from .auth import auth_bp
+from .routes.admin import admin_bp
 from .routes.drivers import driver_bp
+from .routes.payments import payments_bp
 from .routes.ride import ride_bp
 from .routes.user import user_bp
 
@@ -40,6 +42,8 @@ def create_app(config_class: Optional[Type[Config]] = None) -> Flask:
     app.register_blueprint(ride_bp, url_prefix='/api')
     app.register_blueprint(driver_bp, url_prefix='/api')
     app.register_blueprint(user_bp, url_prefix='/api')
+    app.register_blueprint(payments_bp, url_prefix='/api')
+    app.register_blueprint(admin_bp, url_prefix='/api')
 
     _register_static_routes(app)
 

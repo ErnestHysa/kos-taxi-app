@@ -5,6 +5,7 @@ import RideBooking from './pages/RideBooking'
 import DriverLogin from './pages/DriverLogin'
 import DriverRegister from './pages/DriverRegister'
 import DriverDashboard from './pages/DriverDashboard'
+import AdminDashboard from './pages/AdminDashboard'
 import { useDriverProfileQuery } from './state/auth'
 import './App.css'
 
@@ -32,6 +33,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/ride" element={<RideBooking />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/driver/login" element={<DriverLogin />} />
         <Route path="/driver/register" element={<DriverRegister />} />
         <Route element={<ProtectedRoute />}>
