@@ -1,13 +1,8 @@
 import axios, { AxiosError } from 'axios';
 import { useCallback, useState } from 'react';
-import { getApiBaseUrl } from '../config/env';
 
-const apiClient = axios.create({
-  baseURL: getApiBaseUrl(),
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import apiClient from './client';
+import { Ride, RideStatus } from '../types/ride';
 
 export interface RideEstimatePayload {
   pickupAddress: string;
@@ -22,35 +17,14 @@ export interface RideEstimateResponse {
   fare: number;
 }
 
-export interface RideDto {
-  id: number;
-  pickup_address: string;
-  dropoff_address: string;
-  destination_address?: string;
-  scheduled_time: string | null;
-  passenger_count: number;
-  distance_km: number;
-  estimated_duration_minutes: number;
-  fare: number;
-  estimated_fare?: number;
-  status: string;
-  customer_phone?: string | null;
-  user_phone?: string | null;
-  user_email?: string | null;
-  rider_name?: string | null;
-  notes?: string | null;
-  payment_intent_id?: string | null;
-  payment_status?: string | null;
-  created_at: string | null;
-  updated_at: string | null;
-}
-
 export interface CreateRidePayload extends RideEstimatePayload {
   riderName: string;
   riderEmail: string;
   riderPhone: string;
   notes?: string;
 }
+
+export type RideDto = Ride;
 
 export interface CreateRideResponse {
   ride: RideDto;
@@ -164,6 +138,34 @@ export const useCreatePaymentIntent = () => {
   );
 
   return { createPaymentIntent, loading, error } as const;
+};
+
+export const fetchPendingRides = async (): Promise<RideDto[]> => {
+  const { data } = await apiClient.get<{ rides: RideDto[] }>('/rides/pending');
+  return data.rides ?? [];
+};
+
+export const fetchAssignedRides = async (statuses?: RideStatus[]): Promise<RideDto[]> => {
+  const params = statuses && statuses.length > 0 ? { status: statuses.join(',') } : undefined;
+  const { data } = await apiClient.get<{ rides: RideDto[] }>('/drivers/me/assigned-rides', {
+    params,
+  });
+  return data.rides ?? [];
+};
+
+export const acceptRideRequest = async (rideId: number): Promise<RideDto> => {
+  const { data } = await apiClient.post<{ ride: RideDto }>('/drivers/me/rides/' + rideId + '/accept');
+  return data.ride;
+};
+
+export const updateRideStatus = async (
+  rideId: number,
+  status: RideStatus,
+): Promise<RideDto> => {
+  const { data } = await apiClient.patch<{ ride: RideDto }>('/drivers/me/rides/' + rideId + '/status', {
+    status,
+  });
+  return data.ride;
 };
 
 export const isAxiosError = (error: unknown): error is AxiosError => axios.isAxiosError(error);

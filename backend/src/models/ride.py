@@ -1,5 +1,7 @@
 from datetime import datetime
+
 from . import db
+
 
 class Ride(db.Model):
     __tablename__ = 'rides'
@@ -61,39 +63,6 @@ class Ride(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
-
-
-class Driver(db.Model):
-    __tablename__ = 'drivers'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    phone = db.Column(db.String(20), nullable=False)
-    vehicle_model = db.Column(db.String(100), nullable=False)
-    vehicle_plate = db.Column(db.String(20), nullable=False)
-    is_available = db.Column(db.Boolean, default=True)
-    current_lat = db.Column(db.Float, nullable=True)
-    current_lon = db.Column(db.Float, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    rides = db.relationship('Ride', backref='driver', lazy=True)
-    
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'email': self.email,
-            'phone': self.phone,
-            'vehicle_model': self.vehicle_model,
-            'vehicle_plate': self.vehicle_plate,
-            'is_available': self.is_available,
-            'current_lat': self.current_lat,
-            'current_lon': self.current_lon,
-            'created_at': self.created_at.isoformat() if self.created_at else None
-        }
-
-
 class PricingConfig(db.Model):
     __tablename__ = 'pricing_config'
     
