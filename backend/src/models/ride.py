@@ -5,22 +5,27 @@ class Ride(db.Model):
     __tablename__ = 'rides'
     
     id = db.Column(db.Integer, primary_key=True)
-    user_email = db.Column(db.String(120), nullable=False)
-    user_phone = db.Column(db.String(20), nullable=False)
+    rider_name = db.Column(db.String(120), nullable=True)
+    user_email = db.Column(db.String(120), nullable=True)
+    user_phone = db.Column(db.String(20), nullable=True)
     driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'), nullable=True)
-    
-    pickup_lat = db.Column(db.Float, nullable=False)
-    pickup_lon = db.Column(db.Float, nullable=False)
+
+    pickup_lat = db.Column(db.Float, nullable=True)
+    pickup_lon = db.Column(db.Float, nullable=True)
     pickup_address = db.Column(db.String(200), nullable=False)
-    
-    dest_lat = db.Column(db.Float, nullable=False)
-    dest_lon = db.Column(db.Float, nullable=False)
+
+    dest_lat = db.Column(db.Float, nullable=True)
+    dest_lon = db.Column(db.Float, nullable=True)
     dest_address = db.Column(db.String(200), nullable=False)
-    
+
     status = db.Column(db.String(20), default='pending')  # pending, accepted, in_progress, completed, cancelled
     fare = db.Column(db.Float, nullable=False)
     distance_km = db.Column(db.Float, nullable=False)
-    
+    estimated_duration_minutes = db.Column(db.Integer, nullable=False, default=10)
+    passenger_count = db.Column(db.Integer, nullable=False, default=1)
+    scheduled_time = db.Column(db.DateTime, nullable=True)
+    notes = db.Column(db.String(500), nullable=True)
+
     payment_intent_id = db.Column(db.String(100), nullable=True)
     payment_status = db.Column(db.String(20), default='pending')  # pending, succeeded, failed
     
@@ -30,6 +35,7 @@ class Ride(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'rider_name': self.rider_name,
             'user_email': self.user_email,
             'user_phone': self.user_phone,
             'driver_id': self.driver_id,
@@ -39,11 +45,19 @@ class Ride(db.Model):
             'dest_lat': self.dest_lat,
             'dest_lon': self.dest_lon,
             'dest_address': self.dest_address,
+            'dropoff_address': self.dest_address,
+            'destination_address': self.dest_address,
             'status': self.status,
             'fare': self.fare,
             'distance_km': self.distance_km,
+            'estimated_fare': self.fare,
+            'estimated_duration_minutes': self.estimated_duration_minutes,
+            'passenger_count': self.passenger_count,
+            'scheduled_time': self.scheduled_time.isoformat() if self.scheduled_time else None,
+            'notes': self.notes,
             'payment_intent_id': self.payment_intent_id,
             'payment_status': self.payment_status,
+            'customer_phone': self.user_phone,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
