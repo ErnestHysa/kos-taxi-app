@@ -7,7 +7,7 @@ from typing import Optional, Type
 
 from flask import Flask, send_from_directory
 from flask_cors import CORS
-from flask_migrate import Migrate, init as migrations_init
+from flask_migrate import Migrate
 
 from .config import Config, DATABASE_DIR, BASE_DIR, get_config
 from .models import db
@@ -54,10 +54,12 @@ def _bootstrap_filesystem(app: Flask) -> None:
 
     with app.app_context():
         if not MIGRATIONS_DIR.exists():
-            try:
-                migrations_init(directory=str(MIGRATIONS_DIR))
-            except RuntimeError as exc:  # Directory may already exist from another process
-                app.logger.warning("Skipping migrations init: %s", exc)
+            app.logger.info(
+                "Migrations directory missing at %s. Run 'flask db init --directory %s' "
+                "to initialise Alembic before creating migrations.",
+                MIGRATIONS_DIR,
+                MIGRATIONS_DIR,
+            )
 
         db.create_all()
 

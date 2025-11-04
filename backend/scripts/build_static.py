@@ -7,10 +7,10 @@ import shutil
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 FRONTEND_DIR = REPO_ROOT / 'frontend'
 DIST_DIR = FRONTEND_DIR / 'dist'
-STATIC_DIR = REPO_ROOT / 'src' / 'static'
+STATIC_DIR = REPO_ROOT / 'backend' / 'src' / 'static'
 
 
 def copy_assets() -> None:
