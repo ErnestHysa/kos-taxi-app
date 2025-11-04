@@ -100,7 +100,7 @@ def get_payment_for_ride(ride_id: int):
     _configure_stripe()
     payment = ride.payment
 
-    if stripe.api_key and (not payment.metadata or payment.metadata.get('provider') != 'placeholder'):
+    if stripe.api_key and (not payment.metadata_json or payment.metadata_json.get('provider') != 'placeholder'):
         try:
             intent = stripe.PaymentIntent.retrieve(payment.stripe_payment_intent_id)
             payment.update_from_intent(intent)

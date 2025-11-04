@@ -19,7 +19,7 @@ class Payment(db.Model):
     status = db.Column(db.String(50), nullable=False, default="requires_payment_method")
     amount = db.Column(db.Integer, nullable=False)  # Stored in the smallest currency unit (e.g. cents)
     currency = db.Column(db.String(10), nullable=False, default="eur")
-    metadata = db.Column(db.JSON, nullable=True)
+    metadata_json = db.Column("metadata", db.JSON, nullable=True)
     customer_email = db.Column(db.String(120), nullable=True)
     customer_phone = db.Column(db.String(30), nullable=True)
     last_error = db.Column(db.String(255), nullable=True)
@@ -38,7 +38,7 @@ class Payment(db.Model):
         """Synchronise the payment record with the latest Stripe intent payload."""
 
         self.status = intent.get("status", self.status)
-        self.metadata = intent.get("metadata") or self.metadata
+        self.metadata_json = intent.get("metadata") or self.metadata_json
         charges = intent.get("charges", {})
         if isinstance(charges, dict):
             last_charge = (charges.get("data") or [])[-1] if charges.get("data") else None
@@ -59,7 +59,7 @@ class Payment(db.Model):
             "amount": self.amount,
             "amount_eur": self.amount_eur,
             "currency": self.currency,
-            "metadata": self.metadata or {},
+            "metadata": self.metadata_json or {},
             "customer_email": self.customer_email,
             "customer_phone": self.customer_phone,
             "last_error": self.last_error,
@@ -89,7 +89,7 @@ class Payment(db.Model):
             status=intent.get("status", "requires_payment_method"),
             amount=int(intent.get("amount", 0)),
             currency=intent.get("currency", "eur"),
-            metadata=intent.get("metadata"),
+            metadata_json=intent.get("metadata"),
             customer_email=email,
             customer_phone=phone,
         )

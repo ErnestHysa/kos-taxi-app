@@ -443,7 +443,7 @@ def get_payment_status(ride_id):
         return jsonify({'payment_status': ride.payment_status or 'pending'}), 200
 
     _configure_stripe()
-    if stripe.api_key and (not payment.metadata or payment.metadata.get('provider') != 'placeholder'):
+    if stripe.api_key and (not payment.metadata_json or payment.metadata_json.get('provider') != 'placeholder'):
         try:
             intent = stripe.PaymentIntent.retrieve(payment.stripe_payment_intent_id)
             payment.update_from_intent(intent)
