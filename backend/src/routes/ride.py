@@ -1,13 +1,22 @@
-from flask import Blueprint, request, jsonify
-from src.models.ride import db, Ride, PricingConfig
 import math
-import os
 import stripe
+from flask import Blueprint, request, jsonify, current_app
+from src.models import db
+from src.models.ride import Ride, PricingConfig
 
 ride_bp = Blueprint('ride', __name__)
 
-# Configure Stripe (will use test mode if no key is set)
-stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', 'your_stripe_secret_key_here')
+# Stripe configuration is sourced from the Flask app config at runtime.
+
+
+def _configure_stripe():
+    """Ensure the Stripe SDK is using the secret key from the app configuration."""
+    secret_key = current_app.config.get('STRIPE_SECRET_KEY')
+    if secret_key:
+        stripe.api_key = secret_key
+    else:
+        stripe.api_key = None
+        current_app.logger.warning('STRIPE_SECRET_KEY is not configured; payment routes may fail.')
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """Calculate distance between two points in kilometers using Haversine formula"""
@@ -199,6 +208,7 @@ def cancel_ride(ride_id):
 @ride_bp.route('/rides/<int:ride_id>/payment-intent', methods=['POST'])
 def create_payment_intent(ride_id):
     """Create a Stripe payment intent for a ride"""
+    _configure_stripe()
     ride = Ride.query.get(ride_id)
     if not ride:
         return jsonify({'error': 'Ride not found'}), 404
@@ -234,6 +244,7 @@ def create_payment_intent(ride_id):
 @ride_bp.route('/rides/<int:ride_id>/payment-status', methods=['GET'])
 def get_payment_status(ride_id):
     """Get payment status for a ride"""
+    _configure_stripe()
     ride = Ride.query.get(ride_id)
     if not ride:
         return jsonify({'error': 'Ride not found'}), 404

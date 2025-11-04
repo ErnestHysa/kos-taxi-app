@@ -1,48 +1,18 @@
+"""Entrypoint for running the Kos Taxi Flask application."""
+
 import os
 import sys
-# DON'T CHANGE THIS !!!
+
+# Ensure the src package is importable when running as a script.
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask, send_from_directory
-from flask_cors import CORS
-from src.models.ride import db
-from src.routes.ride import ride_bp
-from src.routes.driver import driver_bp
+from src.app import create_app
 
-app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-app.config['SECRET_KEY'] = 'kos-taxi-secret-key-2025'
-
-# Enable CORS for development
-CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-# Register blueprints
-app.register_blueprint(ride_bp, url_prefix='/api')
-app.register_blueprint(driver_bp, url_prefix='/api')
-
-# Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
-
-with app.app_context():
-    db.create_all()
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):
-    static_folder_path = app.static_folder
-    if static_folder_path is None:
-        return "Static folder not configured", 404
-
-    if path != "" and os.path.exists(os.path.join(static_folder_path, path)):
-        return send_from_directory(static_folder_path, path)
-    else:
-        index_path = os.path.join(static_folder_path, 'index.html')
-        if os.path.exists(index_path):
-            return send_from_directory(static_folder_path, 'index.html')
-        else:
-            return "index.html not found", 404
+app = create_app()
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
+    port = int(os.environ.get('FLASK_RUN_PORT', 5000))
+    debug = app.config.get('DEBUG', False)
+    app.run(host=host, port=port, debug=debug)
