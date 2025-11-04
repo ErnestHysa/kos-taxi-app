@@ -1,175 +1,78 @@
-# 🚕 KOS TAXI - QUICK REFERENCE CARD
+# 🚕 Kos Taxi – Quick Reference
 
-## 🌐 APPLICATION URL
-```
-https://60h5imcl10ww.manus.space
-```
+This cheat sheet replaces outdated live links and highlights the commands, endpoints, and credentials you need while developing or operating the Kos Taxi platform.
 
----
+## 🔑 Environment checklist
 
-## 💳 STRIPE TEST KEYS (CURRENTLY ACTIVE)
+- Copy `.env.example` to `.env` and populate:
+  - Backend: `SECRET_KEY`, `DATABASE_URL`, `LOG_LEVEL`, `SENTRY_DSN`, Stripe keys.
+  - Frontend: `VITE_APP_ENV`, `VITE_STRIPE_PUBLISHABLE_KEY`, optional Sentry & metrics variables.
+- For production, set `METRICS_NAMESPACE` to a unique value per environment (e.g. `kos_taxi_staging`).
 
-**Publishable Key:**
-```
-your_stripe_publishable_key_here
-```
-
-**Secret Key:**
-```
-your_stripe_secret_key_here
-```
-
----
-
-## 💰 CURRENT PRICING
-
-- **Base Fare:** €5.00
-- **Per Kilometer:** €1.50
-- **Currency:** EUR
-
----
-
-## 🧪 STRIPE TEST CARDS
-
-**Successful Payment:**
-```
-Card: 4242 4242 4242 4242
-CVV: Any 3 digits
-Expiry: Any future date
-```
-
-**Declined Payment:**
-```
-Card: 4000 0000 0000 0002
-CVV: Any 3 digits
-Expiry: Any future date
-```
-
----
-
-## 📍 GOOD ADDRESS EXAMPLES FOR GEOCODING
-
-✅ "Kos Town, Kos, Greece"
-✅ "Tigaki Beach, Kos, Greece"
-✅ "Kos International Airport, Greece"
-✅ "Psalidi, Kos, Greece"
-✅ "Kardamena, Kos, Greece"
-
----
-
-## 🔧 QUICK API CHECKS
-
-**Check if API is working:**
-```bash
-curl https://60h5imcl10ww.manus.space/api/drivers
-```
-
-**Expected response:**
-```json
-{"drivers":[...]}
-```
-
----
-
-## 📊 VIEW DATABASE
+## ▶️ Core commands
 
 ```bash
-cd /home/ubuntu/kos_taxi_backend
-source venv/bin/activate
-python3 << EOF
-from src.models.ride import db, Ride, Driver
-from src.main import app
+# Backend
+cd backend
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+python src/main.py             # Run API server
+pytest                         # Run backend tests
+ruff check src                 # Lint backend code
 
-with app.app_context():
-    print(f"Total Rides: {Ride.query.count()}")
-    print(f"Total Drivers: {Driver.query.count()}")
-EOF
+# Frontend
+cd frontend
+corepack enable && pnpm install
+pnpm dev                       # Run Vite dev server
+pnpm test                      # Vitest + RTL suite
+pnpm lint                      # ESLint
+pnpm test:e2e                  # Cypress smoke journey (requires build)
 ```
 
----
+## 🌐 Local URLs
 
-## 💾 BACKUP DATABASE
+| Service | URL |
+|---------|-----|
+| Frontend (dev) | `http://127.0.0.1:5173` |
+| Backend API | `http://127.0.0.1:5000/api` |
+| Metrics | `http://127.0.0.1:5000/metrics` |
+
+## 🧪 Stripe sandbox data
+
+| Scenario | Card number | Notes |
+|----------|-------------|-------|
+| Success | `4242 4242 4242 4242` | Any future expiry, any CVC |
+| Declined | `4000 0000 0000 0002` | Simulates card declined error |
+
+Stripe secrets must be supplied via environment variables before attempting live or test charges.
+
+## 📡 API smoke checks
 
 ```bash
-cp /home/ubuntu/kos_taxi_backend/instance/rides.db \
-   /home/ubuntu/kos_taxi_backup_$(date +%Y%m%d).db
+# Health check via ride estimate validation error
+curl -s -X POST http://127.0.0.1:5000/api/rides/estimate -H 'Content-Type: application/json' -d '{}' | jq
+
+# Prometheus metrics preview
+curl -s http://127.0.0.1:5000/metrics | head
 ```
 
----
+## 🛠️ Deployment helpers
 
-## 🔄 REDEPLOY AFTER CHANGES
+- `scripts/deploy_staging.sh` – builds frontend, packages backend, writes `.deploy/staging/DEPLOY_NOTES.md`.
+- `scripts/deploy_production.sh` – installs backend requirements, dry-runs migrations, writes `.deploy/production/CHECKLIST.md`.
+- `.github/workflows/ci.yml` – automated lint/test/build/e2e pipeline triggered on PRs and pushes to `main`.
 
-```bash
-cd /home/ubuntu/kos-taxi-app
-pnpm run build
-cd /home/ubuntu
-rm -rf kos_taxi_backend/src/static/*
-cp -r kos-taxi-app/dist/* kos_taxi_backend/src/static/
-cd kos_taxi_backend
-git add -A && git commit -m "Update"
-```
+## 📈 Observability
 
----
+- Configure `SENTRY_DSN` & `VITE_SENTRY_DSN` to enable error tracking.
+- `/metrics` exposes `http_request_duration_seconds` histogram and `http_requests_total` counter for Prometheus.
+- Frontend web-vital beacons can be forwarded by setting `VITE_METRICS_ENDPOINT`.
 
-## 📞 TYPICAL USER FLOW
+## 📚 Useful references
 
-### Rider:
-1. Open app → Enter email & phone
-2. Set pickup → Set destination
-3. Calculate fare → Request ride
-4. Wait for driver → Complete ride → Pay
+- [PRODUCTION_READY_GUIDE.md](PRODUCTION_READY_GUIDE.md) – detailed deployment & rollback procedures.
+- [KOS_TAXI_DOCUMENTATION.md](KOS_TAXI_DOCUMENTATION.md) – architectural overview.
+- [STRIPE_SETUP_INSTRUCTIONS.md](STRIPE_SETUP_INSTRUCTIONS.md) – payment configuration steps.
+- [QUICK_START_GUIDE.md](QUICK_START_GUIDE.md) – onboarding walkthrough for new developers.
 
-### Driver:
-1. Register (one-time)
-2. Select account from dropdown
-3. View pending rides (auto-refresh)
-4. Accept ride → Contact customer
-5. Complete ride
-
----
-
-## ✅ VERIFIED WORKING FEATURES
-
-✓ Rider interface
-✓ Driver dashboard  
-✓ Driver registration (tested with "Nikos Papadopoulos")
-✓ Ride request system
-✓ Map display (Kos Island)
-✓ Geocoding
-✓ Fare calculation
-✓ Stripe payment integration
-✓ Database persistence
-✓ API endpoints (20+)
-✓ 24/7 availability
-
----
-
-## 🆘 QUICK TROUBLESHOOTING
-
-**Geocoding fails?**
-→ Use more specific address with "Kos, Greece"
-→ Or click directly on map
-
-**Driver dashboard empty?**
-→ Select driver account from dropdown first
-
-**Payment not working?**
-→ Use test card: 4242 4242 4242 4242
-
----
-
-## 📁 FILE LOCATIONS
-
-```
-Frontend: /home/ubuntu/kos-taxi-app/
-Backend: /home/ubuntu/kos_taxi_backend/
-Database: /home/ubuntu/kos_taxi_backend/instance/rides.db
-```
-
----
-
-## 🎯 STATUS: ✅ PRODUCTION READY
-
-**Last Tested:** October 3, 2025
-**Version:** 1.0.0
-**Deployment:** Live & Operational 24/7
+Keep this guide handy when running commands locally, preparing a deployment, or answering quick operational questions.

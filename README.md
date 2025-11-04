@@ -1,320 +1,120 @@
-# 🚕 Kos Taxi - Private Ride-Hailing Application
+# 🚕 Kos Taxi – Modern Ride-Hailing Platform
 
-A full-stack ride-hailing web application for private taxi services in Kos, Greece. Built with React, Flask, and Stripe payment integration.
+Kos Taxi is a full-stack reference implementation for a boutique ride-hailing service operating on Kos Island, Greece. The project couples a React + Vite frontend with a Flask backend, integrates Stripe for payments, and now ships with production-focused observability, comprehensive automated testing, and GitHub Actions CI/CD pipelines.
 
-[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://example.com)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+> **Status:** This repository is ready for local development and deployment to your own infrastructure. There is no hosted demo environment bundled with the codebase.
 
-## 🌟 Features
+## ✨ Highlights
 
-### For Riders
-- 📧 Contact information collection (email, phone)
-- 📍 Interactive map with pickup/destination selection
-- 🗺️ Geocoding for address-to-coordinates conversion
-- 🛣️ Visual route display on map
-- 💰 Distance-based fare calculation
-- 🚗 One-click ride request submission
-- 💳 Integrated Stripe payment processing
-- ✨ Modern UI with smooth animations
+- **Rider experience** – animated marketing site, fare estimation, booking flow, and Stripe payment intent support.
+- **Driver portal** – authentication, ride management dashboard, live ride lists, and status transitions.
+- **Robust backend** – Flask + SQLAlchemy API with JWT auth, notifications, deterministic fare estimation, and placeholder payments when Stripe secrets are absent.
+- **Operational readiness** – centralised logging, Sentry error tracking hooks, Prometheus-compatible metrics (`/metrics`), and deployment scripts for staging & production.
+- **Quality gates** – Pytest suites, Vitest + React Testing Library specs, Cypress smoke journey, and automated linting in CI.
 
-### For Drivers
-- 👤 Separated driver registration flow
-- 📊 Real-time ride request dashboard
-- ✅ Accept/decline ride functionality
-- 🔄 Auto-refresh every 10 seconds
-- 📜 Ride history tracking
-- 🔔 Contact information for each ride
-- 🎨 Clean account selection interface
-- 🚪 Easy logout functionality
+## 🗂️ Repository layout
 
-## 🚀 Live Demo
+```
+backend/               Flask application, models, routes, tests, deploy helpers
+frontend/              React application (Vite), unit tests, Cypress specs
+.github/workflows/     GitHub Actions CI/CD definitions
+scripts/               Deployment automation entry points
+.env.example           Sample configuration for both frontend and backend
+```
 
-**Access the live application:** [https://77h9ikc69o8e.manus.space](https://77h9ikc69o8e.manus.space)
+## 🚀 Getting started
 
-## 🎨 Modern UI/UX Design
+### Prerequisites
 
-The application features a completely redesigned modern interface with:
-- **Gradient-based design** - Beautiful color transitions throughout
-- **Card-based layout** - Clean, organized sections
-- **Smooth animations** - Fade-ins, hover effects, and transitions
-- **Separated flows** - Clear distinction between registration and operations
-- **Icon integration** - Lucide icons for better visual communication
-- **Responsive design** - Works perfectly on desktop, tablet, and mobile
-
-## 🛠️ Tech Stack
-
-### Frontend
-- **React** - UI framework
-- **Vite** - Build tool
-- **Tailwind CSS** - Styling
-- **Leaflet** - Interactive maps
-- **Lucide Icons** - Modern icon library
-- **Stripe Elements** - Payment UI
-
-### Backend
-- **Flask** - Python web framework
-- **SQLAlchemy** - ORM
-- **SQLite** - Database
-- **Stripe API** - Payment processing
-
-## 📋 Prerequisites
-
-- Node.js 18+ and pnpm
 - Python 3.11+
-- Stripe account (for payment processing)
+- Node.js 20+ (Corepack will supply pnpm)
+- A Stripe account (test keys are sufficient for local development)
 
-## 🔐 Configuration
-
-1. Copy the sample environment file and update the values as needed:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   - Backend settings (secret key, database URL, and Stripe secrets) are loaded from `.env` automatically when the Flask app starts.
-   - The `VITE_STRIPE_PUBLISHABLE_KEY` entry is used when you configure the frontend build (see the frontend setup section below).
-
-2. Export the backend variables in your shell before running the server (or use a tool like [direnv](https://direnv.net/)):
-
-   ```bash
-   export $(grep -v '^#' .env | xargs)
-   ```
-
-## 🔧 Installation
-
-### 1. Clone the Repository
+### 1. Clone & bootstrap
 
 ```bash
 git clone https://github.com/ErnestHysa/kos-taxi-app.git
 cd kos-taxi-app
+cp .env.example .env
 ```
 
-### 2. Setup Frontend
+Update `.env` with your secrets. Both the backend and frontend read from this file via `python-dotenv`/Vite.
 
-```bash
-cd frontend
-pnpm install
-```
-
-Create a `frontend/.env` file (or copy from `.env`) to expose the publishable key to Vite:
-```bash
-echo "VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY}" > frontend/.env
-```
-
-### 3. Setup Backend
+### 2. Backend setup
 
 ```bash
 cd backend
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-The backend reads Stripe credentials and Flask settings from the exported environment variables (see [Configuration](#-configuration)).
-On startup it also bootstraps the `backend/src/database/` directory and initialises Flask-Migrate metadata automatically.
-
-### 4. Run the Application
-
-**Development Mode:**
-
-Terminal 1 (Frontend):
-```bash
-cd frontend
-pnpm run dev
-```
-
-Terminal 2 (Backend):
-```bash
-cd backend
-source venv/bin/activate
 python src/main.py
 ```
 
-The helper script `backend/scripts/build_static.py` validates that `frontend/dist/` exists before copying files and ensures `backend/src/static/` is created, preventing missing-folder errors during deployment.
+The Flask server runs on `http://127.0.0.1:5000`. It auto-creates the SQLite database inside `backend/src/database/` and exposes Prometheus metrics at `/metrics`.
 
-**Production Mode:**
+### 3. Frontend setup
 
 ```bash
-# Build frontend
 cd frontend
-pnpm run build
-cd ..
-
-# Copy built assets with safety checks
-python backend/scripts/build_static.py
-
-# Run backend
-cd backend
-source venv/bin/activate
-python src/main.py
+corepack enable
+pnpm install
+pnpm dev
 ```
 
-The application will be available at `http://localhost:5000`
+Visit `http://127.0.0.1:5173` for the Vite dev server. Telemetry hooks read from the Vite-prefixed variables in `.env` (e.g. `VITE_SENTRY_DSN`, `VITE_METRICS_ENDPOINT`).
 
-## 💳 Stripe Configuration
+## 🧪 Testing & quality
 
-### Test Mode (Development)
+| Target          | Command                           | Notes |
+|-----------------|------------------------------------|-------|
+| Backend unit tests | `cd backend && pytest` | Uses an isolated SQLite database and covers critical ride flows plus observability endpoints. |
+| Backend linting | `cd backend && ruff check src` | Enforced in CI. |
+| Frontend unit tests | `cd frontend && pnpm test` | Vitest + React Testing Library with jsdom environment and coverage reports. |
+| Cypress smoke journey | `cd frontend && pnpm test:e2e` | Starts a preview server, navigates from the landing page to the booking form. |
+| Frontend linting | `cd frontend && pnpm lint` | ESLint 9 configuration aligned with the project styles. |
 
-Use these test card numbers:
-- **Success:** `4242 4242 4242 4242`
-- **Decline:** `4000 0000 0000 0002`
-- **CVV:** Any 3 digits
-- **Expiry:** Any future date
+## 🔭 Observability
 
-### Live Mode (Production)
+- **Logging:** Structured root logger configured via `LOG_LEVEL`. Missing Sentry DSN falls back gracefully with informational logging.
+- **Metrics:** Automatic request counters and latency histograms are exposed at `/metrics` using `prometheus_client`. The namespace can be customised with `METRICS_NAMESPACE`.
+- **Error tracking:** Sentry initialises automatically when `SENTRY_DSN`/`VITE_SENTRY_DSN` are supplied, with tunable trace/profile sample rates. Frontend breadcrumbs record notable lifecycle events to aid triage.
 
-1. Get your live Stripe keys from [dashboard.stripe.com](https://dashboard.stripe.com)
-2. Update keys in your environment configuration:
-   - Frontend: `frontend/.env` (`VITE_STRIPE_PUBLISHABLE_KEY`)
-   - Backend: `.env` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`)
-3. Rebuild and redeploy
+## 🔁 CI/CD pipeline
 
-## 💰 Pricing Configuration
+The workflow defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every pull request and push to `main`:
 
-Current pricing structure:
-- **Base Fare:** €5.00
-- **Per Kilometer:** €1.50
-- **Currency:** EUR
+1. **Backend job** – installs dependencies, runs `ruff` and `pytest`.
+2. **Frontend job** – installs pnpm packages, runs ESLint, Vitest, and builds the production bundle.
+3. **E2E job** – reuses the frontend workspace to execute Cypress smoke tests against a preview build.
+4. **Deploy matrix** – on `main`, both `scripts/deploy_staging.sh` and `scripts/deploy_production.sh` are invoked to generate artefacts and rollout checklists.
 
-To modify pricing, update the database or use the API endpoint.
+The deployment scripts create reproducible bundles under `.deploy/<environment>/`, document post-build steps, and validate migrations.
 
-## 🗺️ Map & Geocoding
+## 📦 Deployment overview
 
-- **Map Provider:** OpenStreetMap (Leaflet)
-- **Geocoding:** Nominatim (OpenStreetMap)
+- **Staging:** `scripts/deploy_staging.sh` builds the frontend, packages the backend, and emits a markdown runbook with environment variable requirements.
+- **Production:** `scripts/deploy_production.sh` installs backend dependencies, dry-runs migrations, and produces a release checklist emphasising environment hardening.
 
-**Address Format Tips:**
-- ✅ Good: "Kos Town, Kos, Greece"
-- ✅ Good: "Tigaki Beach, Kos, Greece"
-- ❌ Avoid: "Kos" (too generic)
+Use these scripts as entry points in your own CD solution (e.g. Docker build jobs, Terraform apply steps, or SSH orchestrations).
 
-## 📡 API Endpoints
+## 📚 Additional documentation
 
-### Rides
-- `POST /api/rides/estimate` - Calculate fare
-- `POST /api/rides/request` - Request ride
-- `GET /api/rides/pending` - Get pending rides
-- `POST /api/rides/{id}/accept` - Accept ride
-- `POST /api/rides/{id}/complete` - Complete ride
-- `POST /api/rides/{id}/payment-intent` - Create payment
+- [PRODUCTION_READY_GUIDE.md](PRODUCTION_READY_GUIDE.md) – infrastructure requirements, environment variable catalogue, deployment & rollback playbooks.
+- [QUICK_START_GUIDE.md](QUICK_START_GUIDE.md) – condensed setup instructions for new contributors.
+- [QUICK_REFERENCE.md](QUICK_REFERENCE.md) – API endpoints, test commands, and observability cheat sheet.
+- [KOS_TAXI_DOCUMENTATION.md](KOS_TAXI_DOCUMENTATION.md) – deep dive into architecture, data models, and operational flows.
+- [STRIPE_SETUP_INSTRUCTIONS.md](STRIPE_SETUP_INSTRUCTIONS.md) – end-to-end payment configuration guidance.
 
-### Drivers
-- `POST /api/drivers` - Register driver
-- `GET /api/drivers` - Get all drivers
-- `GET /api/drivers/{id}` - Get driver details
-- `PUT /api/drivers/{id}` - Update driver
+## 🙌 Contributing
 
-See [KOS_TAXI_DOCUMENTATION.md](KOS_TAXI_DOCUMENTATION.md) for complete API reference.
+1. Fork & clone the repository.
+2. Create a feature branch (`git checkout -b feature/my-improvement`).
+3. Make changes and add tests.
+4. Run the full test matrix (backend + frontend + Cypress).
+5. Submit a pull request against `main`.
 
-## 📚 Documentation
-
-- [**PRODUCTION_READY_GUIDE.md**](PRODUCTION_READY_GUIDE.md) - Complete production deployment guide
-- [**QUICK_REFERENCE.md**](QUICK_REFERENCE.md) - Quick reference card
-- [**KOS_TAXI_DOCUMENTATION.md**](KOS_TAXI_DOCUMENTATION.md) - Technical documentation
-- [**STRIPE_SETUP_INSTRUCTIONS.md**](STRIPE_SETUP_INSTRUCTIONS.md) - Payment integration guide
-- [**QUICK_START_GUIDE.md**](QUICK_START_GUIDE.md) - Getting started guide
-
-## 🚀 Deployment
-
-The application is deployed and running 24/7 at:
-**https://77h9ikc69o8e.manus.space**
-
-For deployment instructions, see [PRODUCTION_READY_GUIDE.md](PRODUCTION_READY_GUIDE.md).
-
-## 📁 Project Structure
-
-```
-kos-taxi-app/
-├── frontend/              # React application
-│   ├── src/
-│   │   ├── components/   # React components
-│   │   │   ├── DriverView.jsx    # Driver dashboard
-│   │   │   ├── RiderView.jsx     # Rider interface
-│   │   │   └── MapComponent.jsx  # Map display
-│   │   ├── App.jsx       # Main app component
-│   │   └── main.jsx      # Entry point
-│   ├── package.json
-│   └── vite.config.js
-├── backend/              # Flask application
-│   ├── src/
-│   │   ├── models/       # Database models
-│   │   ├── routes/       # API routes
-│   │   └── main.py       # Flask app entry
-│   ├── requirements.txt
-│   └── instance/         # Database storage
-└── docs/                 # Documentation
-```
-
-## 🧪 Testing
-
-### Test Rider Flow
-1. Open application
-2. Enter email and phone
-3. Set pickup: "Kos Town, Kos, Greece"
-4. Set destination: "Tigaki Beach, Kos, Greece"
-5. Calculate fare
-6. Request ride
-7. See success screen
-
-### Test Driver Flow
-1. Click "Driver Dashboard"
-2. Select existing driver OR register new driver
-3. View dashboard with driver info
-4. See pending rides (auto-refreshes)
-5. Accept a ride
-6. Logout when done
-
-## 🎨 UI/UX Highlights
-
-- **Separated Registration Flow** - No more confusion between signup and dashboard
-- **Modern Gradient Design** - Beautiful color schemes throughout
-- **Smooth Animations** - Fade-ins, hover effects, transitions
-- **Clear Visual Hierarchy** - Easy to understand what to do next
-- **Loading States** - Visual feedback for all operations
-- **Success Screens** - Animated confirmations
-- **Responsive Layout** - Works on all screen sizes
-
-## 🔒 Security
-
-- ✅ HTTPS encryption
-- ✅ Stripe PCI compliance
-- ✅ Input validation
-- ✅ SQL injection protection (SQLAlchemy ORM)
-- ✅ CORS configuration
-
-## 📱 Mobile Support
-
-Fully responsive design works on:
-- ✅ Desktop browsers (Chrome, Firefox, Safari, Edge)
-- ✅ Mobile browsers (iOS Safari, Android Chrome)
-- ✅ Tablets
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👨‍💻 Author
-
-**Ernest Hysa**
-- GitHub: [@ErnestHysa](https://github.com/ErnestHysa)
-
-## 🙏 Acknowledgments
-
-- OpenStreetMap for map tiles
-- Stripe for payment processing
-- Leaflet for map library
-- Lucide for modern icons
-
-## 📞 Support
-
-For issues and questions, please open an issue on GitHub.
+The CI pipeline will validate linting, tests, and produce deployment artefacts automatically.
 
 ---
 
-**Built for private taxi services in Kos, Greece 🇬🇷**
-
-**Live Demo:** [https://77h9ikc69o8e.manus.space](https://77h9ikc69o8e.manus.space)
+Built with ❤️ by the Kos Taxi team & open-source contributors. Questions or ideas? File an issue in the repository!

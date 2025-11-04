@@ -9,7 +9,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import { useDriverProfileQuery } from './state/auth'
 import './App.css'
 
-const ProtectedRoute = () => {
+export const ProtectedRoute = () => {
   const { data: driver, isLoading, isError } = useDriverProfileQuery()
 
   if (isLoading) {

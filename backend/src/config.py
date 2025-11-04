@@ -28,6 +28,13 @@ class Config:
         os.environ.get("JWT_REFRESH_TOKEN_EXPIRES", 7 * 24 * 60 * 60)
     )
 
+    # Logging & observability
+    LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
+    SENTRY_DSN = os.environ.get("SENTRY_DSN")
+    SENTRY_TRACES_SAMPLE_RATE = float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", 0.1))
+    SENTRY_PROFILES_SAMPLE_RATE = float(os.environ.get("SENTRY_PROFILES_SAMPLE_RATE", 0.0))
+    METRICS_NAMESPACE = os.environ.get("METRICS_NAMESPACE", "kos_taxi")
+
     # Stripe configuration - values must be supplied via environment variables
     STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
     STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
